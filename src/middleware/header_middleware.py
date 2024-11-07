@@ -10,9 +10,12 @@ from src.config.constants import (
 )
 
 
+
+
 def check_headers():
     """
     Middleware to parse BobbHeaders and BobbOptionalHeaders from the request.
+    Returns True if valid, otherwise returns a Flask response.
     """
     # Parse BobbHeaders
     custom_header = request.headers.get(X_BOBB_HEADER)
@@ -23,7 +26,7 @@ def check_headers():
         except Exception as e:
             return create_response({"error": ERROR_INVALID_BOBB_HEADER, "details": str(e)}, 400)
     else:
-        g.bobb_header = None
+        return create_response({"error": ERROR_INVALID_BOBB_HEADER}, 400)
 
     # Parse BobbOptionalHeaders
     optional_header = request.headers.get(X_BOBB_OPTIONAL_HEADER)
@@ -31,16 +34,14 @@ def check_headers():
         try:
             leo = BobbOptionalHeaders()
             g.bobb_optional_header = leo.parse_optional_header(
-                bytes.fromhex(optional_header)
-            )
+                bytes.fromhex(optional_header))
         except Exception as e:
             return create_response({"error": ERROR_INVALID_OPTIONAL_HEADER, "details": str(e)}, 400)
     else:
-        g.bobb_optional_header = None
+        return create_response({"error": ERROR_INVALID_OPTIONAL_HEADER}, 400)
 
-    # Print parsed headers for debugging
     print(f"Bobb Header: {g.bobb_header}")
     print(f"Bobb Optional Header: {g.bobb_optional_header}")
 
-    # If headers are valid, allow request to proceed
-    return None
+    # If headers are valid
+    return True
