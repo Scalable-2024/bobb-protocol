@@ -1,6 +1,7 @@
 #!/bin/bash
 
 python3 -m venv bobb_venv
+source ./bobb_venv/bin/activate
 
 pip3 install -r requirements.txt
 
