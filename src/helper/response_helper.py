@@ -1,5 +1,10 @@
 from flask import jsonify
 from typing import Any, Dict, Union
+import logging
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 
 def create_response(data: Union[str, Dict[str, Any], list, tuple], status_code: int) -> tuple:
@@ -18,4 +23,7 @@ def create_response(data: Union[str, Dict[str, Any], list, tuple], status_code: 
         "data": data,
         "status_code": status_code
     }
-    return jsonify(response_body), status_code
+    json_data = jsonify(response_body), status_code
+    logger.info(json_data) if 200 <= status_code else logger.error(
+        json_data)
+    return json_data
