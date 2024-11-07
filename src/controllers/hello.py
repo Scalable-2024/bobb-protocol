@@ -10,5 +10,5 @@ def hello():
     #     "message": "No Bobb optional header in request"}
 
     return create_response({
-        "message": "Hello with Bobb and Bobb Headers!",
+        "message": "Hello from Bobb Protocol!",
     }, 200)
