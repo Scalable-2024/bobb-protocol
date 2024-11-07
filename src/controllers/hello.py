@@ -7,6 +7,6 @@ def hello():
     if g.bob2_header:
         header_data = g.bob2_header
     else:
-        header_data = {"message": "No Bob2 header in request"}
+        header_data = {"message": "No Bobb header in request"}
 
-    return create_response({"message": "Hello with Bob2 Header!", "header_data": header_data}, 200)
+    return create_response({"message": "Hello with Bobb Header!", "header_data": header_data}, 200)
