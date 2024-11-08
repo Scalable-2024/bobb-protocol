@@ -30,10 +30,10 @@ def check_if_satellite(ipv4, port, endpoint):
     try:
         # Log to indicate progress
         print(f"Attempting HTTP request to {ipv4}:{port}/{endpoint}...")
-        curl_addr = f"https://{ipv4}:{port}{endpoint}"
+        curl_addr = f"https://{ipv4}:{port}/{endpoint}"
         # Check the HTTP status code and response
         output = subprocess.check_output(
-            f"curl -s -o /dev/null -w '%{{http_code}}' --noproxy \"*\" --max-time 3 --connect-timeout 2 {curl_addr}",
+            f"curl -s -k -o /dev/null -w '%{{http_code}}' --noproxy \"*\" --max-time 3 --connect-timeout 2 {curl_addr}",
             shell=True,
             text=True,
             stderr=subprocess.DEVNULL
@@ -41,11 +41,12 @@ def check_if_satellite(ipv4, port, endpoint):
         if output.strip() == "200":
             print(f"HTTP 200 OK from {curl_addr}")
             response_body = subprocess.check_output(
-                f"curl -s --noproxy \"*\" --max-time 3 {curl_addr}",
+                f"curl -s -k --noproxy \"*\" --max-time 3 {curl_addr}",
                 shell=True,
                 text=True,
                 stderr=subprocess.DEVNULL
             ).strip()
+	    print(response_body)
             if response_body == "I am a satellite":
                 return True
         return False
@@ -75,7 +76,7 @@ def main(ping_ip, port, output_csv, endpoint):
     sorted_results = sorted(results, key=lambda x: x["Response Time (ms)"])
     # Write results to CSV
     with open(output_csv, "w", newline="") as csvfile:
-        fieldnames = ["IPv4", "IPv6", "Response Time (ms)", "HTTP Response"]
+        fieldnames = ["IPv4", "IPv6", "Response Time (ms)", "Is a satellite?"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(sorted_results)
@@ -90,6 +91,6 @@ if __name__ == "__main__":
                         help="Port which will serve satellite identification")
     parser.add_argument("--output_csv", required=True,
                         help="Output CSV file name (e.g., results.csv)")
-    parser.add_argument('--endpoint', default="/id", help="The endpoint which the satellite serves its identification on - eg /id")
+    parser.add_argument('--endpoint', default="id", help="The endpoint which the satellite serves its identification on - eg /id")
     args = parser.parse_args()
     main(args.ping_ip, args.port, args.output_csv, args.endpoint)
