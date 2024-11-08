@@ -25,13 +25,13 @@ def ping_with_response_time(ipv4, timeout=1):
     except subprocess.CalledProcessError:
         return None  # Ping failed or timeout
     
-def check_if_satellite(ipv4, port):
+def check_if_satellite(ipv4, port, endpoint):
     """Make an HTTP request using curl and return the response message if status code is 200."""
     try:
         # Log to indicate progress
-        print(f"Attempting HTTP request to {ipv4}:{port}...")
-        # First check the HTTP status code
-        response = requests.get(f"https://{ipv4}:{port}/")
+        print(f"Attempting HTTP request to {ipv4}:{port}/{endpoint}...")
+        # Check the HTTP status code and response
+        response = requests.get(f"https://{ipv4}:{port}/{endpoint}", timeout=2)
         if response.status_code == "200" and response.text.strip() == "I am a satellite":
             return True
         return False
@@ -39,7 +39,7 @@ def check_if_satellite(ipv4, port):
         print(f"Got error: {e}")
         return False
     
-def main(ping_ip, port, output_csv):
+def main(ping_ip, port, output_csv, endpoint):
     results = []
     for ip in range(1, 50):  # Example scan of 50 IPs, adjust range as needed
         ipv4 = "{}.{}".format(ping_ip, ip)
@@ -48,7 +48,7 @@ def main(ping_ip, port, output_csv):
         if response_time is not None:
             print(f"{ipv4} is active. Fetching HTTP response...")
             ipv6 = ipv4_to_ipv6(ipv4)
-            is_satellite = check_if_satellite(ipv4, port)
+            is_satellite = check_if_satellite(ipv4, port, endpoint)
             results.append({
                 "IPv4": ipv4,
                 "IPv6": ipv6,
@@ -76,5 +76,6 @@ if __name__ == "__main__":
                         help="Port which will serve satellite identification")
     parser.add_argument("--output_csv", required=True,
                         help="Output CSV file name (e.g., results.csv)")
+    parser.add_argument('--endpoint', default="/id", help="The endpoint which the satellite serves its identification on - eg /id")
     args = parser.parse_args()
-    main(args.ping_ip, args.port, args.output_csv)
+    main(args.ping_ip, args.port, args.output_csv, args.endpoint)
