@@ -50,7 +50,7 @@ def check_if_satellite(ipv4, port, endpoint):
                 stderr=subprocess.DEVNULL
             ).strip()
             print(response_body)
-        if response_body == "I am a satellite":
+        #if response_body == "I am a satellite":
             return True
         return False
     except Exception as e:
