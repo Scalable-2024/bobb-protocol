@@ -5,9 +5,11 @@ import re
 import csv
 import requests
 
+
 def ipv4_to_ipv6(ipv4):
     """Convert an IPv4 address to IPv6 using the ::ffff: method."""
     return "::ffff:{}".format(ipv4)
+
 
 def ping_with_response_time(ipv4, timeout=1):
     """Ping an IPv4 address and return the response time in ms."""
@@ -24,7 +26,8 @@ def ping_with_response_time(ipv4, timeout=1):
         return None
     except subprocess.CalledProcessError:
         return None  # Ping failed or timeout
-    
+
+
 def check_if_satellite(ipv4, port, endpoint):
     """Make an HTTP request using curl and return the response message if status code is 200."""
     try:
@@ -46,14 +49,15 @@ def check_if_satellite(ipv4, port, endpoint):
                 text=True,
                 stderr=subprocess.DEVNULL
             ).strip()
-	    print(response_body)
-            if response_body == "I am a satellite":
-                return True
+            print(response_body)
+        if response_body == "I am a satellite":
+            return True
         return False
     except Exception as e:
         print(f"Got error: {e}")
         return False
-    
+
+
 def main(ping_ip, port, output_csv, endpoint):
     results = []
     for ip in range(1, 50):  # Example scan of 50 IPs, adjust range as needed
@@ -82,15 +86,17 @@ def main(ping_ip, port, output_csv, endpoint):
         writer.writerows(sorted_results)
     print(f"CSV file '{output_csv}' has been created.")
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Ping sweep for a given network and save results to CSV.")
     parser.add_argument("--ping_ip", required=True,
                         help="Base IP address for ping (e.g., 192.168.1)")
-    parser.add_argument("--port", default=9000, 
+    parser.add_argument("--port", default=9000,
                         help="Port which will serve satellite identification")
     parser.add_argument("--output_csv", required=True,
                         help="Output CSV file name (e.g., results.csv)")
-    parser.add_argument('--endpoint', default="id", help="The endpoint which the satellite serves its identification on - eg /id")
+    parser.add_argument('--endpoint', default="id",
+                        help="The endpoint which the satellite serves its identification on - eg /id")
     args = parser.parse_args()
     main(args.ping_ip, args.port, args.output_csv, args.endpoint)
