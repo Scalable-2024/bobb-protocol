@@ -31,7 +31,7 @@ def check_if_satellite(ipv4, port, endpoint):
         # Log to indicate progress
         print(f"Attempting HTTP request to {ipv4}:{port}/{endpoint}...")
         # Check the HTTP status code and response
-        response = requests.get(f"https://{ipv4}:{port}/{endpoint}", timeout=2)
+        response = requests.get(f"https://{ipv4}:{port}/{endpoint}", timeout=2, proxies={"no_proxy":""})
         if response.status_code == "200" and response.text.strip() == "I am a satellite":
             return True
         return False
