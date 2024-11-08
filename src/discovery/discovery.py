@@ -30,10 +30,25 @@ def check_if_satellite(ipv4, port, endpoint):
     try:
         # Log to indicate progress
         print(f"Attempting HTTP request to {ipv4}:{port}/{endpoint}...")
+        curl_addr = f"https://{ipv4}:{port}{endpoint}"
         # Check the HTTP status code and response
-        response = requests.get(f"https://{ipv4}:{port}/{endpoint}", timeout=2, proxies={"no_proxy":""})
-        if response.status_code == "200" and response.text.strip() == "I am a satellite":
-            return True
+        output = subprocess.check_output(
+            f"curl -s -o /dev/null -w '%{{http_code}}' --noproxy \"*\" --max-time 3 --connect-timeout 2 {
+                curl_addr}",
+            shell=True,
+            text=True,
+            stderr=subprocess.DEVNULL
+        )
+        if output.strip() == "200":
+            print(f"HTTP 200 OK from {curl_addr}")
+            response_body = subprocess.check_output(
+                f"curl -s --noproxy \"*\" --max-time 3 {curl_addr}",
+                shell=True,
+                text=True,
+                stderr=subprocess.DEVNULL
+            ).strip()
+            if response_body == "I am a satellite":
+                return True
         return False
     except Exception as e:
         print(f"Got error: {e}")
