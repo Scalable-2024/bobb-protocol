@@ -33,8 +33,7 @@ def check_if_satellite(ipv4, port, endpoint):
         curl_addr = f"https://{ipv4}:{port}{endpoint}"
         # Check the HTTP status code and response
         output = subprocess.check_output(
-            f"curl -s -o /dev/null -w '%{{http_code}}' --noproxy \"*\" --max-time 3 --connect-timeout 2 {
-                curl_addr}",
+            f"curl -s -o /dev/null -w '%{{http_code}}' --noproxy \"*\" --max-time 3 --connect-timeout 2 {curl_addr}",
             shell=True,
             text=True,
             stderr=subprocess.DEVNULL
