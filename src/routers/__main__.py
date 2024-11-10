@@ -1,11 +1,10 @@
 from flask import Blueprint
-from src.controllers.create_header import create_header
+
+from src.controllers.create_headers import create_header
 from src.controllers.hello import hello
 from src.middleware.header_middleware import check_headers
 
 router = Blueprint('main', __name__)
-
-
 
 @router.route('/', methods=['GET'])
 def root():
