@@ -1,10 +1,10 @@
 from flask import Blueprint
+
+from src.controllers.create_headers import create_header
 from src.controllers.hello import hello
 from src.middleware.header_middleware import check_headers
 
 router = Blueprint('main', __name__)
-
-
 
 @router.route('/', methods=['GET'])
 def root():
@@ -14,3 +14,7 @@ def root():
 
     # Call controller function if headers are valid
     return hello()
+
+@router.route('/create-header', methods=['POST'])
+def create_custom_headers():
+    return create_header()
