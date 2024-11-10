@@ -12,3 +12,9 @@ def hello():
     return create_response({
         "message": "Hello from Bobb Protocol!",
     }, 200)
+
+def hello_post():
+
+    return create_response({
+        "message": "Bobb has recieved data!"
+    }, 201)
