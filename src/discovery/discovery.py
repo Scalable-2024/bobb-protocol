@@ -68,20 +68,22 @@ def main(ping_ip, port, output_csv, endpoint):
         if response_time is not None:
             print(f"{ipv4} is active. Fetching HTTP response...")
             ipv6 = ipv4_to_ipv6(ipv4)
-            is_satellite = check_if_satellite(ipv4, port, endpoint)
-            results.append({
-                "IPv4": ipv4,
-                "IPv6": ipv6,
-                "Response Time (ms)": response_time,
-                "Is a satellite?": is_satellite
-            })
+            for port in range(33001, 33101):
+                is_satellite = check_if_satellite(ipv4, port, endpoint)
+                results.append({
+                    "IPv4": ipv4,
+                    "IPv6": ipv6,
+                    "Port": port,
+                    "Response Time (ms)": response_time,
+                    "Is a satellite?": is_satellite
+                })
         else:
             print(f"{ipv4} did not respond. Skipping HTTP request.")
     # Sort results by response time
     sorted_results = sorted(results, key=lambda x: x["Response Time (ms)"])
     # Write results to CSV
     with open(output_csv, "w", newline="") as csvfile:
-        fieldnames = ["IPv4", "IPv6", "Response Time (ms)", "Is a satellite?"]
+        fieldnames = ["IPv4", "IPv6", "Port", "Response Time (ms)", "Is a satellite?"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(sorted_results)

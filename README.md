@@ -49,6 +49,19 @@ The header should contain the following information:
 - Destination-Port: Port of the destination
 - Max-Hops: Maximum number of hops the message can take
 
+## Running the code
+Basic code is provided to create a satellite (in progress) - this should be forked for customisation specific to your team, but shared logic should remain the same.
+
+To start up one satellite on your machine - uses default port 33001:
+```shell
+sh run.sh
+```
+
+To start up many satellites at once on one machine (max 100, shown here 5):
+```shell
+sh multi-satellite.sh 5
+```
+
 ## Features
 The Bobb protocol has the following features:
 - Satellite discovery
@@ -84,8 +97,9 @@ To test the API endpoints, use the Postman collection linked below:
 Postman Collection Link <https://elements.getpostman.com/redirect?entityId=31802781-42cf7b59-0dbf-4800-b6af-69e2161a5772&entityType=collection>
 
 ## **Base URL**: 
+The first satellite is on port 33001, and satellites can run on any port between 33001-33100 (inclusive).
 ```
-https://127.0.0.1:30001
+https://127.0.0.1:33001
 ```
 
 ### **Endpoints**
@@ -115,7 +129,7 @@ Returns a greeting message along with validated BobbHeaders and BobbOptionalHead
       "version_minor": 0,
       "message_type": 1,
       "dest_ipv6": "::1",
-      "dest_port": 30001,
+      "dest_port": 33001,
       "source_ipv6": "::1",
       "source_port": 12345,
       "sequence_number": 123,
@@ -162,7 +176,7 @@ Returns a greeting message along with validated BobbHeaders and BobbOptionalHead
 ### **Testing with Postman**
 
 1. Set the request type to `GET`.
-2. Use the URL: `https://127.0.0.1:30001/`.
+2. Use the URL: `https://127.0.0.1:33001/`.
 3. Add the following headers:
    - **X-Bobb-Header**: `<valid hexadecimal Bobb header>`
    - **X-Bobb-Optional-Header**: `<valid hexadecimal Bobb optional header>`.
