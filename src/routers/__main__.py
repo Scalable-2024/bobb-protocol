@@ -1,11 +1,11 @@
 from flask import Blueprint
+
+from src.controllers.create_headers import create_header
 from src.controllers.hello import hello
 from src.controllers.identify import return_identity
 from src.middleware.header_middleware import check_headers
 
 router = Blueprint('main', __name__)
-
-
 
 @router.route('/', methods=['GET'])
 def root():
@@ -19,3 +19,7 @@ def root():
 @router.route('/id', methods=['GET'])
 def identify():
     return return_identity()
+
+@router.route('/create-header', methods=['POST'])
+def create_custom_headers():
+    return create_header()

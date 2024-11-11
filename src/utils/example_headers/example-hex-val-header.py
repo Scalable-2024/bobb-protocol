@@ -12,7 +12,7 @@ class Bob2Headers:
         self.timestamp = timestamp if timestamp else int(time.time())
         self.dest_ipv6 = "::1"
         self.source_ipv6 = "::1"
-        self.dest_port = 8189
+        self.dest_port = 30001
         self.source_port = 12345
 
     def build_header(self):
