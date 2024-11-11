@@ -4,6 +4,7 @@ import subprocess
 import re
 import csv
 import requests
+import json
 
 
 def ipv4_to_ipv6(ipv4):
@@ -49,9 +50,11 @@ def check_if_satellite(ipv4, port, endpoint):
                 text=True,
                 stderr=subprocess.DEVNULL
             ).strip()
-            print(response_body)
-        #if response_body == "I am a satellite":
-            return True
+            data = json.loads(response_body)
+            if data["data"] == "I am a satellite":
+                return True
+            else:
+                print(f"{data} does not equal 'I am a satellite'")
         return False
     except Exception as e:
         print(f"Got error: {e}")
