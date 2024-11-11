@@ -91,11 +91,11 @@ def main(ping_ip, port, output_csv, endpoint):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Ping sweep for a given network and save results to CSV.")
-    parser.add_argument("--ping_ip", required=True,
+    parser.add_argument("--ping_ip", default="10.35.70",
                         help="Base IP address for ping (e.g., 192.168.1)")
-    parser.add_argument("--port", default=9000,
+    parser.add_argument("--port", default=33001,
                         help="Port which will serve satellite identification")
-    parser.add_argument("--output_csv", required=True,
+    parser.add_argument("--output_csv", default="results.csv",
                         help="Output CSV file name (e.g., results.csv)")
     parser.add_argument('--endpoint', default="id",
                         help="The endpoint which the satellite serves its identification on - eg /id")
