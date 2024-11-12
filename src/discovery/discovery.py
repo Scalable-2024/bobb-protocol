@@ -3,6 +3,7 @@ import subprocess
 import re
 import csv
 import requests
+import os
 
 # TODO allow self signed certificates
 import urllib3
@@ -92,6 +93,25 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
 def select_satellites(list, count):
     selected_results = sorted(list, key=lambda x: x["Response Time"])
     return(selected_results[0:count])
+
+# Note that this is finding the list of potential satellites, outside of the simulation.
+# This is because we need the ip addresses to simulate communication.
+# It should return the intended neighbour satellites - for now, just the ones with the lowest latency.
+def get_neighbouring_satellites():
+    starter_satellite_list = find_x_satellites(x=5)
+    print(f"Satellites length: {len(starter_satellite_list)}")
+
+    port = os.getenv("PORT")
+    base_dir = os.getcwd()
+    directory_path = os.path.join(base_dir, "resources", "satellite_listings")
+    file_name = os.path.join(directory_path, f"full_satellite_listing_{port}.csv")
+    os.makedirs(directory_path, exist_ok=True)
+
+    with open(file_name, "w", newline="") as csvfile:
+        fieldnames = ["IPv4", "IPv6", "Port", "Response Time", "Device Type"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(starter_satellite_list)
 
 
 def main(ping_ip, port, output_csv, endpoint):
