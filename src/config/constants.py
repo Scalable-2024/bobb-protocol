@@ -17,3 +17,7 @@ STATUS_BAD_REQUEST = 400
 STATUS_UNAUTHORIZED = 401
 STATUS_NOT_FOUND = 404
 STATUS_INTERNAL_SERVER_ERROR = 500
+
+# CSV File Paths
+DEVICE_IPS_PATH = "src/static/1_devices_ips.csv"
+DEVICE_CONNECTION_PATH = "src/static/1_devices_connection.csv"
