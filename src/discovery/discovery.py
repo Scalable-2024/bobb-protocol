@@ -1,10 +1,18 @@
-import os
 import argparse
 import subprocess
 import re
 import csv
 import requests
-import json
+
+# TODO allow self signed certificates
+import urllib3
+urllib3.disable_warnings()
+
+# To block the SCSS proxying, to connect directly to the other pis
+proxies = {
+  'http': '',
+  'https': '',
+}
 
 
 def ipv4_to_ipv6(ipv4):
@@ -33,28 +41,18 @@ def check_if_satellite(ipv4, port, endpoint):
     """Make an HTTP request using curl and return the response message if status code is 200."""
     try:
         # Log to indicate progress
-        print(f"Attempting HTTP request to {ipv4}:{port}/{endpoint}...")
-        curl_addr = f"https://{ipv4}:{port}/{endpoint}"
+        addr = f"https://{ipv4}:{port}/{endpoint}"
+        print(f"Attempting HTTP request to {addr}...")
+        # TODO: Allow self signed certificates
+        resp = requests.get(addr, verify=False, timeout=3, proxies=proxies)
         # Check the HTTP status code and response
-        output = subprocess.check_output(
-            f"curl -s -k -o /dev/null -w '%{{http_code}}' --noproxy \"*\" --max-time 3 --connect-timeout 2 {curl_addr}",
-            shell=True,
-            text=True,
-            stderr=subprocess.DEVNULL
-        )
-        if output.strip() == "200":
-            print(f"HTTP 200 OK from {curl_addr}")
-            response_body = subprocess.check_output(
-                f"curl -s -k --noproxy \"*\" --max-time 3 {curl_addr}",
-                shell=True,
-                text=True,
-                stderr=subprocess.DEVNULL
-            ).strip()
-            data = json.loads(response_body)
-            if data["data"] == "I am a satellite":
+        if resp.status_code == 200:
+            print(f"HTTP 200 OK from {addr}")
+            json = resp.json()
+            if json["data"] == "I am a satellite":
                 return True
             else:
-                print(f"{data} does not equal 'I am a satellite'")
+                print(f"{addr} is responding, but is not verified to be a bobb satellite - {json['data']} does not equal 'I am a satellite'")
         return False
     except Exception as e:
         print(f"Got error: {e}")
@@ -93,11 +91,11 @@ def main(ping_ip, port, output_csv, endpoint):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Ping sweep for a given network and save results to CSV.")
-    parser.add_argument("--ping_ip", required=True,
+    parser.add_argument("--ping_ip", default="10.35.70",
                         help="Base IP address for ping (e.g., 192.168.1)")
-    parser.add_argument("--port", default=9000,
+    parser.add_argument("--port", default=33001,
                         help="Port which will serve satellite identification")
-    parser.add_argument("--output_csv", required=True,
+    parser.add_argument("--output_csv", default="results.csv",
                         help="Output CSV file name (e.g., results.csv)")
     parser.add_argument('--endpoint', default="id",
                         help="The endpoint which the satellite serves its identification on - eg /id")
