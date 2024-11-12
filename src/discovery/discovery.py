@@ -85,7 +85,7 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
                     })
     
     selected_results = sorted(results, key=lambda x: x["Response Time"])
-    return selected_results
+    return selected_results[0:x]
 
 # For now, we select satellites as being close to each other if their latencies are low.
 # This may change, so it's a seperated function
