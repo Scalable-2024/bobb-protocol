@@ -3,8 +3,8 @@
 python3 -m venv bobb_venv
 source ./bobb_venv/bin/activate
 
-pip3 install -r requirements.txt
-
+echo "Installing Python dependencies"
+pip3 install -r requirements.txt > /dev/null 2>&1
 
 # openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes
 

@@ -37,26 +37,61 @@ def ping_with_response_time(ipv4, timeout=1):
         return None  # Ping failed or timeout
 
 
-def check_if_satellite(ipv4, port, endpoint):
+def check_if_satellite(ipv4, port, endpoint, verbose):
     """Make an HTTP request using curl and return the response message if status code is 200."""
     try:
         # Log to indicate progress
         addr = f"https://{ipv4}:{port}/{endpoint}"
-        print(f"Attempting HTTP request to {addr}...")
+        if verbose:
+            print(f"Attempting HTTP request to {addr}...")
         # TODO: Allow self signed certificates
         resp = requests.get(addr, verify=False, timeout=3, proxies=proxies)
         # Check the HTTP status code and response
         if resp.status_code == 200:
-            print(f"HTTP 200 OK from {addr}")
+            if verbose:
+                print(f"HTTP 200 OK from {addr}")
             json = resp.json()
             if json["data"] == "I am a satellite":
                 return True
             else:
-                print(f"{addr} is responding, but is not verified to be a bobb satellite - {json['data']} does not equal 'I am a satellite'")
+                if verbose:
+                    print(f"{addr} is responding, but is not verified to be a bobb satellite - {json['data']} does not equal 'I am a satellite'")
         return False
     except Exception as e:
-        print(f"Got error: {e}")
+        if verbose:
+            print(f"Got error: {e}")
         return False
+    
+def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5):
+    results = []
+
+    # Default list of ips to check - raspberry pi IPs
+    if ips_to_check == None:
+        ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+
+    for ip in ips_to_check:
+        response_time = ping_with_response_time(ip)
+        if response_time is not None:
+            for port in range(min_port, max_port+1):
+                is_satellite = check_if_satellite(ip, port, endpoint, verbose=False)
+                # The only case we care about is when the IP and port are valid
+                if is_satellite:
+                    results.append({
+                        "IPv4": ip,
+                        "IPv6": ipv4_to_ipv6(ip),
+                        "Port": port,
+                        "Response Time": response_time,
+                        "Device Type": "Satellite"
+                    })
+    
+    selected_results = sorted(results, key=lambda x: x["Response Time"])
+    return selected_results
+
+# For now, we select satellites as being close to each other if their latencies are low.
+# This may change, so it's a seperated function
+def select_satellites(list, count):
+    selected_results = sorted(list, key=lambda x: x["Response Time"])
+    return(selected_results[0:count])
 
 
 def main(ping_ip, port, output_csv, endpoint):
@@ -69,7 +104,7 @@ def main(ping_ip, port, output_csv, endpoint):
             print(f"{ipv4} is active. Fetching HTTP response...")
             ipv6 = ipv4_to_ipv6(ipv4)
             for port in range(33001, 33101):
-                is_satellite = check_if_satellite(ipv4, port, endpoint)
+                is_satellite = check_if_satellite(ipv4, port, endpoint, verbose=True)
                 results.append({
                     "IPv4": ipv4,
                     "IPv6": ipv6,

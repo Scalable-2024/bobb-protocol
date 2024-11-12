@@ -5,11 +5,16 @@ from src.utils.headers.necessary_headers import BobbHeaders
 from src.utils.headers.optional_header import BobbOptionalHeaders
 from src.helpers.response_helper import create_response
 from src.config.constants import X_BOBB_HEADER, X_BOBB_OPTIONAL_HEADER, ERROR_INVALID_BOBB_HEADER, ERROR_INVALID_OPTIONAL_HEADER
+from src.discovery.discovery import find_x_satellites
 
 app = Flask(__name__)
 
 # Register routers
 app.register_blueprint(main_router)
+
+starter_satellite_list = find_x_satellites(x=5)#, ips_to_check=['172.31.116.126'])
+print("Satellites")
+print(starter_satellite_list)
 
 
 @app.before_request
@@ -68,3 +73,4 @@ def add_custom_headers_to_response(response):
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
