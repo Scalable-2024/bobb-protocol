@@ -1,9 +1,10 @@
 import json
 
 class SatelliteHandshake:
-    def __init__(self, satellite_function, public_key, connected_nodes=None):
+    def __init__(self, satellite_function, public_key, port, connected_nodes=None):
         self.satellite_function = satellite_function
         self.public_key = public_key
+        self.port = port
         self.connected_nodes = connected_nodes if connected_nodes is not None else []
 
     def build_message(self):
@@ -11,6 +12,7 @@ class SatelliteHandshake:
         message = {
             "satellite_function": self.satellite_function,
             "public_key": self.public_key,
+            "port": self.port,
             "connected_nodes": [
                 {
                     "satellite_function": node["satellite_function"],
@@ -31,6 +33,7 @@ class SatelliteHandshake:
         # Extract data into fields
         self.satellite_function = parsed_data.get("satellite_function")
         self.public_key = parsed_data.get("public_key")
+        self.port = parsed_data.get("port")
         self.connected_nodes = parsed_data.get("connected_nodes", [])
         
         return parsed_data
