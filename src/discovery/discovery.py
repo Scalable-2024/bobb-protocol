@@ -99,7 +99,6 @@ def select_satellites(list, count):
 # It should return the intended neighbour satellites - for now, just the ones with the lowest latency.
 def get_neighbouring_satellites():
     starter_satellite_list = find_x_satellites(x=5)
-    print(f"Satellites length: {len(starter_satellite_list)}")
 
     port = os.getenv("PORT")
     base_dir = os.getcwd()
