@@ -11,5 +11,7 @@ pip3 install -r requirements.txt > /dev/null 2>&1
 # Set default port
 PORT=${1:-33001}
 export PORT
+export IP=$(hostname -I | awk '{print $1}')
+
 
 hypercorn src.app:app --certfile cert/cert.pem --keyfile cert/key.pem --bind 0.0.0.0:$PORT --reload

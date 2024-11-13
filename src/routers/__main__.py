@@ -25,7 +25,7 @@ def identify():
 def create_custom_headers():
     return create_header()
 
-@router.route('/handshake', methods=['GET'])
+@router.route('/handshake', methods=['POST'])
 def receive_handshake():
     middleware_response = check_headers()
     if middleware_response is not True:
