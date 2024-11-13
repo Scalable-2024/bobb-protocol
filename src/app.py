@@ -9,6 +9,7 @@ from src.utils.headers.optional_header import BobbOptionalHeaders
 from src.helpers.response_helper import create_response
 from src.config.constants import X_BOBB_HEADER, X_BOBB_OPTIONAL_HEADER, ERROR_INVALID_BOBB_HEADER, ERROR_INVALID_OPTIONAL_HEADER
 from src.discovery.discovery import get_neighbouring_satellites
+from src.helpers.send_handshake_helper import send_handshakes
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import atexit
@@ -23,7 +24,10 @@ scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
 # Schedule satellite discovery every 5 minutes
-scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(minutes=5), id='scheduled_task', replace_existing=True)
+scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(minutes=5), id='device_discovery', replace_existing=True)
+
+# Schedule handshaking every 30s
+scheduler.add_job(func=send_handshakes, trigger=IntervalTrigger(seconds=30), id='sending_handshakes', replace_existing=True)
 
 def initial_satellite_search():
     time.sleep(2)

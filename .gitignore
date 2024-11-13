@@ -7,4 +7,5 @@ __pycache__/
 .vscode/
 .venv/
 bobb_venv/
-resources/satellites/
+resources/satellite_listings/
+resources/satellite_neighbours/
