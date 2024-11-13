@@ -10,14 +10,14 @@ class Bob2Headers:
         self.message_type = message_type
         self.sequence_number = sequence_number
         self.timestamp = timestamp if timestamp else int(time.time())
-        self.dest_ipv6 = "::1"
-        self.source_ipv6 = "::1"
+        self.dest_ipv4 = "127.0.0.1"
+        self.source_ipv4 = "127.0.0.1"
         self.dest_port = 30001
         self.source_port = 12345
 
     def build_header(self):
-        dest_ip_bytes = socket.inet_pton(socket.AF_INET6, self.dest_ipv6)
-        source_ip_bytes = socket.inet_pton(socket.AF_INET6, self.source_ipv6)
+        dest_ip_bytes = socket.inet_pton(socket.AF_INET, self.dest_ipv4)
+        source_ip_bytes = socket.inet_pton(socket.AF_INET, self.source_ipv4)
         header = struct.pack("!BBB", self.version_major,
                              self.version_minor, self.message_type)
         header += dest_ip_bytes + struct.pack("!H", self.dest_port)

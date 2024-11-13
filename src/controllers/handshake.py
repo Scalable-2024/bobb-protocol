@@ -17,9 +17,9 @@ def handshake():
     except json.JSONDecodeError as e:
         return create_response({"error": f"Failed to parse JSON: {str(e)}"}, 400)
 
-    # Retrieve IP address from g.bobb_header, assuming it's stored under 'source_ipv6'
+    # Retrieve IP address from g.bobb_header, assuming it's stored under 'source_ipv4'
     bobb_header = g.bobb_header
-    source_ip = bobb_header["source_ipv6"]
+    source_ip = bobb_header["source_ipv4"]
 
     # Extract necessary fields from the handshake data
     satellite_function = handshake_data["satellite_function"]

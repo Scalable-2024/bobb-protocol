@@ -16,11 +16,6 @@ proxies = {
 }
 
 
-def ipv4_to_ipv6(ipv4):
-    """Convert an IPv4 address to IPv6 using the ::ffff: method."""
-    return "::ffff:{}".format(ipv4)
-
-
 def ping_with_response_time(ipv4, timeout=1):
     """Ping an IPv4 address and return the response time in ms."""
     try:
@@ -79,7 +74,6 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
                 if is_satellite:
                     results.append({
                         "IPv4": ip,
-                        "IPv6": ipv4_to_ipv6(ip),
                         "Port": port,
                         "Response Time": response_time,
                         "Device Type": "Satellite"
@@ -107,7 +101,7 @@ def get_neighbouring_satellites():
     os.makedirs(directory_path, exist_ok=True)
 
     with open(file_name, "w", newline="") as csvfile:
-        fieldnames = ["IPv4", "IPv6", "Port", "Response Time", "Device Type"]
+        fieldnames = ["IPv4", "Port", "Response Time", "Device Type"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(starter_satellite_list)
@@ -121,12 +115,10 @@ def main(ping_ip, port, output_csv, endpoint):
         response_time = ping_with_response_time(ipv4)
         if response_time is not None:
             print(f"{ipv4} is active. Fetching HTTP response...")
-            ipv6 = ipv4_to_ipv6(ipv4)
             for port in range(33001, 33101):
                 is_satellite = check_if_satellite(ipv4, port, endpoint, verbose=True)
                 results.append({
                     "IPv4": ipv4,
-                    "IPv6": ipv6,
                     "Port": port,
                     "Response Time (ms)": response_time,
                     "Is a satellite?": is_satellite
@@ -137,7 +129,7 @@ def main(ping_ip, port, output_csv, endpoint):
     sorted_results = sorted(results, key=lambda x: x["Response Time (ms)"])
     # Write results to CSV
     with open(output_csv, "w", newline="") as csvfile:
-        fieldnames = ["IPv4", "IPv6", "Port", "Response Time (ms)", "Is a satellite?"]
+        fieldnames = ["IPv4", "Port", "Response Time (ms)", "Is a satellite?"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(sorted_results)

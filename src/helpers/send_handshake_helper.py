@@ -5,7 +5,6 @@ import requests
 from src.utils.handshake_body import SatelliteHandshake
 from src.utils.headers.necessary_headers import BobbHeaders
 from src.config.constants import X_BOBB_HEADER
-from src.discovery.discovery import ipv4_to_ipv6
 
 # TODO allow self signed certificates
 import urllib3
@@ -30,12 +29,12 @@ def send_handshake(neighbour):
     n_ip, n_port = neighbour
     satellite_function = "undefined" # Replace for each groups code
     public_key = "" # TODO add public key here
-    ip = ipv4_to_ipv6(os.getenv("IP"))
+    ip = os.getenv("IP")
     port = int(os.getenv("PORT"))
     connected_nodes = [] # Currently not allowing recursive nodes
 
     handshake_body = SatelliteHandshake(satellite_function, public_key, port, connected_nodes).build_message()
-    header = BobbHeaders(message_type=1, source_ipv6=ip, source_port=port).build_header().hex()
+    header = BobbHeaders(message_type=1, source_ipv4=ip, source_port=port).build_header().hex()
     headers = {
         X_BOBB_HEADER: header,
     }

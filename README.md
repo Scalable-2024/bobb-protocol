@@ -59,10 +59,10 @@ Satellite discovery is done by sending a broadcast message to all satellites in 
 
 The code for this is in discovery.py, and is acting outside the model of satellites - while satellites find each other by rotating in LEO until they can see another satellite, our raspberry pis have no movement or antennae, so we need to retrieve IP addresses of all possible satellites before simulating the satellite behaviour.
 
-This list is stored in `resources/satellite_listings/full_satellite_listing_{port}.csv`. This specifies the port in the file name to allow several satellite instances to run independently on a single raspberry pi. The headers are as follows - note that IPv6 is planned to be deprecated from this project, and currently this only manages Satellite device types:
+This list is stored in `resources/satellite_listings/full_satellite_listing_{port}.csv`. This specifies the port in the file name to allow several satellite instances to run independently on a single raspberry pi. The headers are as follows:
 
 ```
-IPv4,IPv6,Port,Response Time,Device Type
+IPv4,Port,Response Time,Device Type
 ```
 
 ### Handshaking
@@ -130,9 +130,9 @@ Returns a greeting message along with validated BobbHeaders and BobbOptionalHead
       "version_major": 1,
       "version_minor": 0,
       "message_type": 1,
-      "dest_ipv6": "::1",
+      "dest_ipv4": "127.0.0.1",
       "dest_port": 33001,
-      "source_ipv6": "::1",
+      "source_ipv4": "127.0.0.1",
       "source_port": 12345,
       "sequence_number": 123,
       "timestamp": 1697083106
