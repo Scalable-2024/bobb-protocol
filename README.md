@@ -10,27 +10,13 @@ The protocol will be greatly based on the other bob2 protocol which we discussed
 
 ### Message format
 #### Handshake message
-The handshake message is used to discover satellites and base stations in the network. The message follows the following format:
+The handshake message is used to discover satellites and base stations in the network. The message follows the following format, with ip address in the X-Bobb-Header:
 ```json
 {
-    "type": "handshake",
-    "ip": "10.0.0.1",
-    "function": "disaster-imaging",
+    "satellite_function": "disaster-imaging",
     "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzZ",
-    "connected": [
-      {
-        "ip": "10.0.0.2",
-        "function": "disaster-imaging",
-        "public_key": "-----BEGIN PUBLIC KEY----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzZ",
-        "connected": []
-      },
-      {
-        "ip": "10.0.0.3",
-        "function": "whale-tracking",
-        "public_key": "-----BEGIN PUBLIC KEY----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzZ",
-        "connected": []
-      }
-    ]
+    "port": "33001",
+    "connected": []
 }
 ```
 
@@ -69,23 +55,38 @@ The Bobb protocol has the following features:
 - End-to-end encryption using Public Key Infrastructure (PKI)
 
 ### Satellite discovery
-Satellite discovery is done by sending a broadcast message to all satellites in the network. The satellite will respond with a message containing its IP, function and public key.
+Satellite discovery is done by sending a broadcast message to all satellites in the network. All satellites running Bob2 code will respond with a 200 status code. These will be added to a list, which neighbours are selected from.
+
+The code for this is in discovery.py, and is acting outside the model of satellites - while satellites find each other by rotating in LEO until they can see another satellite, our raspberry pis have no movement or antennae, so we need to retrieve IP addresses of all possible satellites before simulating the satellite behaviour.
+
+This list is stored in `resources/satellite_listings/full_satellite_listing_{port}.csv`. This specifies the port in the file name to allow several satellite instances to run independently on a single raspberry pi. The headers are as follows - note that IPv6 is planned to be deprecated from this project, and currently this only manages Satellite device types:
+
+```
+IPv4,IPv6,Port,Response Time,Device Type
+```
 
 ### Handshaking
-Handshaking is done during satellite discovering. The satellite will send a message containing its IP, function and public key. The basestation will respond with a message containing its IP, function and public key.
-
-During the handshaking phase the satellites and basestation save the information (IP, function and public key) of the other party. This information is then propagated to all other satellites and base stations in the network.
-
-The handshake includes information about which other satellites or base stations are connected to the satellite or basestation. This again will contain the IP, function and public key of the other party.
+Handshaking between satellites only has been set up, but the logic will remain the same between satellites and base stations. Each satellite sends a handshake message to each of its neighbours (selected during satellite discovery). This contains the satellites IP, port, function, and public key. The receiving satellite stores these details in a json - `resources/satellite_neighbours/neighbours_{port}.json`. This specifies the port in the file name to allow several satellite instances to run independently on a single raspberry pi. Currently, connected nodes are not specified here, but they are supported. An example of this:
+```json
+[
+    {
+        "ip": "::ffff:172.31.116.126",
+        "function": "undefined",
+        "public_key": "",
+        "port": 33001,
+        "connected_nodes": []
+    },
+]
+```
 
 ### End-to-end encryption using Public Key Infrastructure (PKI)
 The Bobb protocol uses Public Key Infrastructure (PKI) to encrypt messages between satellites and base stations. The public key of the other party is used to encrypt the message. The private key of the other party is used to decrypt the message.
 
 ## Current use cases
 The Bobb protocol is currently used for the following use cases:
-- Disaster imaging
-- Whale tracking
-- Offshore wind farm monitoring
+- Disaster imaging (Group 13)
+- Whale tracking (Group 1)
+- Offshore wind farm monitoring (Group 8)
 
 ## Future use cases
 Whatever other teams come up with
