@@ -1,6 +1,5 @@
-import csv
-import json
 import os
+import json
 from flask import request, g
 from src.helpers.response_helper import create_response
 
@@ -22,44 +21,44 @@ def handshake():
     if not satellite_function or not public_key or port is None:
         return create_response({"error": "Missing required fields in handshake data"}, 400)
 
-    # Append the data to the CSV file if it's a new neighbor
-    if write_to_csv(source_ip, satellite_function, public_key, port, connected_nodes):
+    # Append the data to the JSON file if it's a new neighbor
+    if write_to_json(source_ip, satellite_function, public_key, port, connected_nodes):
         return create_response({"message": "Neighbor added successfully"}, 200)
     else:
         return create_response({"message": "Neighbor already exists"}, 200)
 
-def write_to_csv(source_ip, satellite_function, public_key, port, connected_nodes):
+def write_to_json(source_ip, satellite_function, public_key, port, connected_nodes):
     # Get file path for storing neighbor data
     own_port = os.getenv("PORT")
     base_dir = os.getcwd()
     directory_path = os.path.join(base_dir, "resources", "satellite_neighbours")
-    file_name = os.path.join(directory_path, f"neighbours_{own_port}.csv")
+    file_name = os.path.join(directory_path, f"neighbours_{own_port}.json")
     os.makedirs(directory_path, exist_ok=True)
 
-    # Check if the neighbor (source_ip, port) combination already exists
+    # Load existing data if the JSON file exists
     if os.path.isfile(file_name):
-        with open(file_name, mode="r", newline="") as csv_file:
-            reader = csv.DictReader(csv_file)
-            for row in reader:
-                if row["ip"] == source_ip and row["port"] == str(port):
-                    return False  # Neighbor already exists
+        with open(file_name, "r") as json_file:
+            neighbors = json.load(json_file)
+    else:
+        neighbors = []
 
-    # Append the new neighbor entry if it does not exist
-    with open(file_name, mode="a", newline="") as csv_file:
-        fieldnames = ["ip", "function", "public_key", "port", "connected_nodes"]
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        
-        # Write headers if file is newly created
-        if csv_file.tell() == 0:
-            writer.writeheader()
+    # Check if the neighbor (source_ip, port) combination already exists
+    for neighbor in neighbors:
+        if neighbor["ip"] == source_ip and neighbor["port"] == port:
+            return False  # Neighbor already exists
 
-        # Write the row with connected nodes as a JSON string
-        writer.writerow({
-            "ip": source_ip,
-            "function": satellite_function,
-            "public_key": public_key,
-            "port": port,
-            "connected_nodes": json.dumps(connected_nodes)
-        })
+    # Create a new neighbor entry
+    new_neighbor = {
+        "ip": source_ip,
+        "function": satellite_function,
+        "public_key": public_key,
+        "port": port,
+        "connected_nodes": connected_nodes
+    }
+
+    # Append the new neighbor and save back to JSON
+    neighbors.append(new_neighbor)
+    with open(file_name, "w") as json_file:
+        json.dump(neighbors, json_file, indent=4)
 
     return True
