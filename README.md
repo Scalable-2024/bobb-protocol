@@ -85,6 +85,7 @@ The Bobb protocol uses Public Key Infrastructure (PKI) to encrypt messages betwe
 The Bobb protocol is currently used for the following use cases:
 - Disaster imaging
 - Whale tracking
+- Offshore wind farm monitoring
 
 ## Future use cases
 Whatever other teams come up with
@@ -96,7 +97,7 @@ This repository contains a Flask-based API that implements custom headers (X-Bob
 To test the API endpoints, use the Postman collection linked below:
 Postman Collection Link <https://elements.getpostman.com/redirect?entityId=31802781-42cf7b59-0dbf-4800-b6af-69e2161a5772&entityType=collection>
 
-## **Base URL**: 
+## **Base URL**:
 The first satellite is on port 33001, and satellites can run on any port between 33001-33100 (inclusive).
 ```
 https://127.0.0.1:33001
@@ -108,7 +109,7 @@ https://127.0.0.1:33001
 
 #### **1. GET `/`**
 
-**Description**:  
+**Description**:
 Returns a greeting message along with validated BobbHeaders and BobbOptionalHeaders.
 
 **Headers**:
@@ -148,7 +149,7 @@ Returns a greeting message along with validated BobbHeaders and BobbOptionalHead
 
 **Error Responses**:
 - **400 Bad Request**: If a required header is missing or invalid.
-  
+
 **Example**:
 ```json
 {
@@ -171,7 +172,7 @@ Returns a greeting message along with validated BobbHeaders and BobbOptionalHead
 672df859050241455331323800000000000000000000
 ```
 
---- 
+---
 
 ### **Testing with Postman**
 
