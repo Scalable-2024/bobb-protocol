@@ -37,8 +37,8 @@ def check_headers():
                 bytes.fromhex(optional_header))
         except Exception as e:
             return create_response({"error": ERROR_INVALID_OPTIONAL_HEADER, "details": str(e)}, 400)
-    else:
-        return create_response({"error": ERROR_INVALID_OPTIONAL_HEADER}, 400)
+   # else:
+        #return create_response({"error": ERROR_INVALID_OPTIONAL_HEADER}, 400)
 
     print(f"Bobb Header: {g.bobb_header}")
     print(f"Bobb Optional Header: {g.bobb_optional_header}")
