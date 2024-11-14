@@ -5,6 +5,7 @@ import requests
 from src.utils.handshake_body import SatelliteHandshake
 from src.utils.headers.necessary_headers import BobbHeaders
 from src.config.constants import X_BOBB_HEADER
+from src.helpers.general_handshake_helper import create_handshake_message, write_received_handshake
 
 # TODO allow self signed certificates
 import urllib3
@@ -17,10 +18,13 @@ proxies = {
 }
 
 def send_handshakes():
+    print("Checking if new handshakes required")
     known_satellites = set(get_known_satellites())
     current_neighbours = set(get_neighbours())
 
     new_neighbours = known_satellites - current_neighbours
+    print(f"Unknown neighbours are {new_neighbours}")
+    print(f"Known neighbours are {current_neighbours}")
     for neighbour in new_neighbours:
         send_handshake(neighbour)
 
@@ -33,16 +37,17 @@ def send_handshake(neighbour):
     port = int(os.getenv("PORT"))
     connected_nodes = [] # Currently not allowing recursive nodes
 
-    handshake_body = SatelliteHandshake(satellite_function, public_key, port, connected_nodes).build_message()
-    header = BobbHeaders(message_type=1, source_ipv4=ip, source_port=port).build_header().hex()
-    headers = {
-        X_BOBB_HEADER: header,
-    }
-
+    # Send handshake
+    handshake_body, headers = create_handshake_message(satellite_function, public_key, port, ip)
     resp = requests.post(f"https://{n_ip}:{n_port}/handshake", verify=False, timeout=3, proxies=proxies, headers=headers, json=handshake_body)
-    print(f"Handshake response: {resp.status_code}, {resp.text}")
 
-    return
+    # Deal with response from handshake - another handshake
+    data = resp.json()["data"]
+    bobb = BobbHeaders()
+    bobb_header = bobb.parse_header(bytes.fromhex(resp.headers.get(X_BOBB_HEADER)))
+    write_received_handshake(data, bobb_header)
+
+    print(f"Dealt with handshake response!")
     
 def get_known_satellites():
     ip_port_pairs = []
@@ -58,7 +63,7 @@ def get_known_satellites():
         for row in reader:
             # Extract the IP and Port values
             ipv4 = row.get("IPv4")
-            port = row.get("Port")
+            port = int(row.get("Port"))
             
             # Add IPv4 and Port if both are present
             if ipv4 and port:

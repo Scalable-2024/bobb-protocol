@@ -67,25 +67,27 @@ def add_custom_headers_to_response(response):
     """
     Middleware to inject the BobbHeaders and LEOOptionalHeaders into the response.
     """
-    # Add BobbHeader to response
-    bobb_response = BobbHeaders(
-        version_major=1,
-        version_minor=0,
-        message_type=2,
-        sequence_number=456,
-        timestamp=int(time.time())
-    )
-    response.headers[X_BOBB_HEADER] = bobb_response.build_header().hex()
+    if X_BOBB_HEADER not in response.headers:
+        # Add BobbHeader to response
+        bobb_response = BobbHeaders(
+            version_major=1,
+            version_minor=0,
+            message_type=2,
+            sequence_number=456,
+            timestamp=int(time.time())
+        )
+        response.headers[X_BOBB_HEADER] = bobb_response.build_header().hex()
 
-    # Add LEOOptionalHeader to response
-    leo_response = BobbOptionalHeaders(
-        timestamp=int(time.time()),
-        hop_count=10,
-        priority=1,
-        encryption_algo="AES256"
-    )
-    response.headers[X_BOBB_OPTIONAL_HEADER] = leo_response.build_optional_header(
-    ).hex()
+    if X_BOBB_OPTIONAL_HEADER not in response.headers:
+        # Add LEOOptionalHeader to response
+        leo_response = BobbOptionalHeaders(
+            timestamp=int(time.time()),
+            hop_count=10,
+            priority=1,
+            encryption_algo="AES256"
+        )
+        response.headers[X_BOBB_OPTIONAL_HEADER] = leo_response.build_optional_header(
+        ).hex()
 
     return response
 
