@@ -96,11 +96,12 @@ if __name__ == "__main__":
         description="Bobb Satellite Parser")
 
     parser.add_argument('--function', type=str, help='Satellite function')
+    parser.add_argument('--port', type=int, help='Port number')
     args = parser.parse_args()
 
     if not args.function:
         exit("Satellite function not provided")
 
-    name = load_from_config_file(args.function)["name"]
+    name = load_from_config_file(args.function, args.port)["name"]
     generate_keys(name)
-    app.run(debug=True, port=30001)
+    app.run(debug=True, port=args.port)

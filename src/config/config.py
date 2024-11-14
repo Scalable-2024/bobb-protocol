@@ -15,15 +15,15 @@ valid_functions = {
     SATELLITE_FUNCTION_POST_FLOOD_SURVIVOR_DETECTION_AERIALDRONES
 }
 
-def load_from_config_file(function):
+def load_from_config_file(function, port):
     # check if config file exists
     if os.path.exists(CONFIG_FILE_PATH):
         with open(CONFIG_FILE_PATH, "r") as config_file:
             return json.load(config_file)
 
-    return create_config(function)
+    return create_config(function, port)
 
-def create_config(function):
+def create_config(function, port):
     if function in valid_functions:
         pass
     else:
