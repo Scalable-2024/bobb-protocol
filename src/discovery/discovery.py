@@ -4,6 +4,7 @@ import re
 import csv
 import requests
 import os
+import random
 
 # TODO allow self signed certificates
 import urllib3
@@ -62,7 +63,7 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
     results = []
 
     # Default list of ips to check - raspberry pi IPs
-    if ips_to_check == None:
+    if ips_to_check is None:
         ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
 
     for ip in ips_to_check:
@@ -79,14 +80,14 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
                         "Device Type": "Satellite"
                     })
     
-    selected_results = sorted(results, key=lambda x: x["Response Time"])
-    return selected_results[0:x]
+    # Randomly select x satellites from the results
+    if len(results) > x:
+        selected_results = random.sample(results, x)
+    else:
+        # If there are fewer than x results, return all of them
+        selected_results = results
 
-# For now, we select satellites as being close to each other if their latencies are low.
-# This may change, so it's a seperated function
-def select_satellites(list, count):
-    selected_results = sorted(list, key=lambda x: x["Response Time"])
-    return(selected_results[0:count])
+    return selected_results
 
 # Note that this is finding the list of potential satellites, outside of the simulation.
 # This is because we need the ip addresses to simulate communication.
