@@ -1,4 +1,3 @@
-bobb_venv
 __pycache__/
 *.pyc
 *.pyo
@@ -9,3 +8,5 @@ __pycache__/
 bobb_venv/
 resources/satellite_listings/
 resources/satellite_neighbours/
+src/keys/
+src/config/config.json

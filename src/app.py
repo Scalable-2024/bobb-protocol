@@ -1,9 +1,10 @@
+import argparse
 import time
 import threading
-import os
-import csv
 from flask import Flask, request, g
+from src.config.config import load_from_config_file
 from src.routers.__main__ import router as main_router
+from src.utils.crypto_utils import generate_keys
 from src.utils.headers.necessary_headers import BobbHeaders
 from src.utils.headers.optional_header import BobbOptionalHeaders
 from src.helpers.response_helper import create_response
@@ -93,5 +94,16 @@ def add_custom_headers_to_response(response):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-    
+    parser = argparse.ArgumentParser(
+        description="Bobb Satellite Parser")
+
+    parser.add_argument('--function', type=str, help='Satellite function')
+    parser.add_argument('--port', type=int, help='Port number')
+    args = parser.parse_args()
+
+    if not args.function:
+        exit("Satellite function not provided")
+
+    name = load_from_config_file(args.function, args.port)["name"]
+    generate_keys(name)
+    app.run(debug=True, port=args.port)
