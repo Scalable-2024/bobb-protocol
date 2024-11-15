@@ -23,7 +23,7 @@ def send_handshakes():
         known_satellites = set(get_known_satellites())
         current_neighbours = set(get_neighbours())
     except FileNotFoundError:
-        return # No need to send handshakes if neither file exists yet
+        return # If there are no known satellites, no need to send handshakes
 
     new_neighbours = known_satellites - current_neighbours
     print(f"Unknown neighbours are {new_neighbours}")

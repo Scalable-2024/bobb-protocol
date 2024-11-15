@@ -88,6 +88,9 @@ The Bobb protocol is currently used for the following use cases:
 - Whale tracking (Group 1)
 - Offshore wind farm monitoring (Group 8)
 
+## Device Types
+There are a number of device types/satellite functions supported by this protocol/system, which are defined in src/config/constants. Some of these may have different behaviours, controlled by their type as defined on startup. To make use of this, pass whatever valid device type is required into multi-device.sh. Note that this setup treats base stations as a valid device type.
+
 ## Future use cases
 Whatever other teams come up with
 
