@@ -3,7 +3,8 @@ import logging
 import os
 
 from src.config.constants import SATELLITE_FUNCTION_DISASTER_IMAGING, SATELLITE_FUNCTION_WHALE_TRACKING, \
-    SATELLITE_FUNCTION_WINDFARM_MONITORING, SATELLITE_FUNCTION_POST_FLOOD_SURVIVOR_DETECTION_AERIALDRONES
+    SATELLITE_FUNCTION_WINDFARM_MONITORING, SATELLITE_FUNCTION_POST_FLOOD_SURVIVOR_DETECTION_AERIALDRONES, \
+    BASESTATION
 from src.helpers.name_generator import generate_name
 
 valid_functions = {
@@ -25,14 +26,11 @@ def load_from_config_file(function, port):
     return create_config(function, port)
 
 def create_config(function, port):
-    print(f"Port before creating config: {port}")
     if function in valid_functions:
         pass
     else:
         logging.error("Invalid satellite function")
         exit()
-
-    print(f"Creating config with function: {function}")
 
     config = {
         "name": generate_name(port),

@@ -5,6 +5,8 @@ import csv
 import requests
 import os
 import random
+import re
+from src.config.config import valid_functions
 
 # TODO allow self signed certificates
 import urllib3
@@ -34,7 +36,7 @@ def ping_with_response_time(ipv4, timeout=1):
         return None  # Ping failed or timeout
 
 
-def check_if_satellite(ipv4, port, endpoint, verbose):
+def check_device_type(ipv4, port, endpoint, verbose):
     """Make an HTTP request using curl and return the response message if status code is 200."""
     try:
         # Log to indicate progress
@@ -47,17 +49,15 @@ def check_if_satellite(ipv4, port, endpoint, verbose):
         if resp.status_code == 200:
             if verbose:
                 print(f"HTTP 200 OK from {addr}")
-            json = resp.json()
-            if json["data"] == "I am a satellite":
-                return True
-            else:
-                if verbose:
-                    print(f"{addr} is responding, but is not verified to be a bobb satellite - {json['data']} does not equal 'I am a satellite'")
-        return False
+            data = resp.json()['data']
+            if data in valid_functions:
+                return data
+            
+        return None
     except Exception as e:
         if verbose:
             print(f"Got error: {e}")
-        return False
+        return None
     
 def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5):
     results = []
@@ -70,14 +70,14 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
         response_time = ping_with_response_time(ip)
         if response_time is not None:
             for port in range(min_port, max_port+1):
-                is_satellite = check_if_satellite(ip, port, endpoint, verbose=False)
+                function = check_device_type(ip, port, endpoint, verbose=False)
                 # The only case we care about is when the IP and port are valid
-                if is_satellite:
+                if function is not None:
                     results.append({
                         "IPv4": ip,
                         "Port": port,
                         "Response Time": response_time,
-                        "Device Type": "Satellite"
+                        "Device Function": function,
                     })
     
     # Randomly select x satellites from the results
@@ -102,39 +102,11 @@ def get_neighbouring_satellites():
     os.makedirs(directory_path, exist_ok=True)
 
     with open(file_name, "w", newline="") as csvfile:
-        fieldnames = ["IPv4", "Port", "Response Time", "Device Type"]
+        fieldnames = ["IPv4", "Port", "Response Time", "Device Function"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(starter_satellite_list)
 
-
-def main(ping_ip, port, output_csv, endpoint):
-    results = []
-    for ip in range(1, 50):  # Example scan of 50 IPs, adjust range as needed
-        ipv4 = "{}.{}".format(ping_ip, ip)
-        print(f"Pinging {ipv4}...")
-        response_time = ping_with_response_time(ipv4)
-        if response_time is not None:
-            print(f"{ipv4} is active. Fetching HTTP response...")
-            for port in range(33001, 33101):
-                is_satellite = check_if_satellite(ipv4, port, endpoint, verbose=True)
-                results.append({
-                    "IPv4": ipv4,
-                    "Port": port,
-                    "Response Time (ms)": response_time,
-                    "Is a satellite?": is_satellite
-                })
-        else:
-            print(f"{ipv4} did not respond. Skipping HTTP request.")
-    # Sort results by response time
-    sorted_results = sorted(results, key=lambda x: x["Response Time (ms)"])
-    # Write results to CSV
-    with open(output_csv, "w", newline="") as csvfile:
-        fieldnames = ["IPv4", "Port", "Response Time (ms)", "Is a satellite?"]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(sorted_results)
-    print(f"CSV file '{output_csv}' has been created.")
 
 
 if __name__ == "__main__":

@@ -16,7 +16,6 @@ def get_ip_addresses() -> Tuple[Optional[str], Optional[str]]:
     return ipv4_address
 
 def generate_name(port):
-    print(f"Port before generating name: {port}")
     left_side = [
         "admiring",
         "adoring",
