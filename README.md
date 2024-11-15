@@ -13,7 +13,7 @@ The protocol will be greatly based on the other bob2 protocol which we discussed
 The handshake message is used to discover satellites and base stations in the network. The message follows the following format, with ip address in the X-Bobb-Header:
 ```json
 {
-    "satellite_function": "disaster-imaging",
+    "device_function": "disaster-imaging",
     "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzZ",
     "port": "33001",
     "connected": []
@@ -70,9 +70,10 @@ Handshaking between satellites only has been set up, but the logic will remain t
 ```json
 [
     {
-        "ip": "::ffff:172.31.116.126",
-        "function": "undefined",
-        "public_key": "",
+        //"ip": "::ffff:172.31.116.126", Included in the header instead
+        "name": "kind-pike-10.35.70.1:33001",
+        "function": "whale-tracking",
+        "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VuAyEAEhqgVWqTrTRHydIj7aHflbuFhIYrrCdi4GiOKUqyKkQ=\n-----END PUBLIC KEY-----\n",
         "port": 33001,
         "connected_nodes": []
     },

@@ -5,6 +5,7 @@ import requests
 from src.utils.handshake_body import SatelliteHandshake
 from src.utils.headers.necessary_headers import BobbHeaders
 from src.config.constants import X_BOBB_HEADER
+from src.config.config import CONFIG_FILE_PATH
 from src.helpers.general_handshake_helper import create_handshake_message, write_received_handshake
 
 # TODO allow self signed certificates
@@ -34,23 +35,30 @@ def send_handshakes():
 
 def send_handshake(neighbour):
     n_ip, n_port = neighbour
-    satellite_function = "undefined" # Replace for each groups code
-    public_key = "" # TODO add public key here
+
+    
     ip = os.getenv("IP")
     port = int(os.getenv("PORT"))
-    connected_nodes = [] # Currently not allowing recursive nodes
 
-    # Send handshake
-    handshake_body, headers = create_handshake_message(satellite_function, public_key, port, ip)
-    resp = requests.post(f"https://{n_ip}:{n_port}/handshake", verify=False, timeout=3, proxies=proxies, headers=headers, json=handshake_body)
+    with open(CONFIG_FILE_PATH(port), "r") as config_file:
+        config = json.load(config_file)
+        name = config["name"]
+        function = config["function"]
+        public_key_path = os.path.join("keys", f"{name}_public_key.pem")
+        with open(public_key_path, "r") as public_key_file:
+            public_key = public_key_file.read()
+            handshake_body, headers = create_handshake_message(name, function, public_key, port, ip)
 
-    # Deal with response from handshake - another handshake
-    data = resp.json()["data"]
-    bobb = BobbHeaders()
-    bobb_header = bobb.parse_header(bytes.fromhex(resp.headers.get(X_BOBB_HEADER)))
-    write_received_handshake(data, bobb_header)
+            # Send handshake
+            resp = requests.post(f"https://{n_ip}:{n_port}/handshake", verify=False, timeout=3, proxies=proxies, headers=headers, json=handshake_body)
 
-    print(f"Dealt with handshake response!")
+            # Deal with response from handshake - another handshake
+            data = resp.json()["data"]
+            bobb = BobbHeaders()
+            bobb_header = bobb.parse_header(bytes.fromhex(resp.headers.get(X_BOBB_HEADER)))
+            write_received_handshake(data, bobb_header)
+
+            print(f"Dealt with handshake response!")
     
 def get_known_satellites():
     ip_port_pairs = []
