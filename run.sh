@@ -11,6 +11,7 @@ pip3 install -r requirements.txt > /dev/null 2>&1
 # Set default port
 PORT=${1:-33001}
 export PORT
+echo $PORT
 
 # Set IP address enviroment variable based on the OS (useful for testing on different device operating systems (even though pi will use linux))
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -27,6 +28,13 @@ else
     exit 1
 fi
 
+# Check if the input (DEVICE_FUNCTION) is provided
+DEVICE_FUNCTION=$2
+if [ -z "$DEVICE_FUNCTION" ]; then
+    echo "Usage: $0 <DEVICE_FUNCTION>"
+    exit 1
+fi
+export DEVICE_FUNCTION
 
 
 hypercorn src.app:app --certfile cert/cert.pem --keyfile cert/key.pem --bind 0.0.0.0:$PORT --reload

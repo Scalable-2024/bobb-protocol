@@ -19,8 +19,11 @@ proxies = {
 
 def send_handshakes():
     print("Checking if new handshakes required")
-    known_satellites = set(get_known_satellites())
-    current_neighbours = set(get_neighbours())
+    try:
+        known_satellites = set(get_known_satellites())
+        current_neighbours = set(get_neighbours())
+    except FileNotFoundError:
+        return # No need to send handshakes if neither file exists yet
 
     new_neighbours = known_satellites - current_neighbours
     print(f"Unknown neighbours are {new_neighbours}")

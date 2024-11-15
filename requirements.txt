@@ -9,3 +9,4 @@ setuptools
 rsa
 requests
 APScheduler
+cryptography

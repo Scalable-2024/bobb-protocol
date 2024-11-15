@@ -1,6 +1,7 @@
 import argparse
 import time
 import threading
+import os
 from flask import Flask, request, g
 from src.config.config import load_from_config_file
 from src.routers.__main__ import router as main_router
@@ -14,6 +15,13 @@ from src.helpers.send_handshake_helper import send_handshakes
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import atexit
+
+device_function = os.getenv("DEVICE_FUNCTION")
+port = int(os.getenv("PORT"))
+print(f"Port: {port}")
+
+name = load_from_config_file(device_function, port)["name"]
+generate_keys(name)
 
 app = Flask(__name__)
 

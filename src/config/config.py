@@ -6,8 +6,6 @@ from src.config.constants import SATELLITE_FUNCTION_DISASTER_IMAGING, SATELLITE_
     SATELLITE_FUNCTION_WINDFARM_MONITORING, SATELLITE_FUNCTION_POST_FLOOD_SURVIVOR_DETECTION_AERIALDRONES
 from src.helpers.name_generator import generate_name
 
-CONFIG_FILE_PATH = "config/config.json"
-
 valid_functions = {
     SATELLITE_FUNCTION_DISASTER_IMAGING,
     SATELLITE_FUNCTION_WHALE_TRACKING,
@@ -15,15 +13,19 @@ valid_functions = {
     SATELLITE_FUNCTION_POST_FLOOD_SURVIVOR_DETECTION_AERIALDRONES
 }
 
+def CONFIG_FILE_PATH(port):
+    return f"config/config_{port}.json"
+
 def load_from_config_file(function, port):
     # check if config file exists
-    if os.path.exists(CONFIG_FILE_PATH):
-        with open(CONFIG_FILE_PATH, "r") as config_file:
+    if os.path.exists(CONFIG_FILE_PATH(port)):
+        with open(CONFIG_FILE_PATH(port), "r") as config_file:
             return json.load(config_file)
 
     return create_config(function, port)
 
 def create_config(function, port):
+    print(f"Port before creating config: {port}")
     if function in valid_functions:
         pass
     else:
@@ -37,7 +39,9 @@ def create_config(function, port):
         "function": function
     }
 
-    with open(CONFIG_FILE_PATH, "w") as config_file:
+    os.makedirs(os.path.dirname(CONFIG_FILE_PATH(port)), exist_ok=True)
+
+    with open(CONFIG_FILE_PATH(port), "w") as config_file:
         json.dump(config, config_file)
 
     return config
