@@ -19,7 +19,6 @@ proxies = {
 }
 
 def send_handshakes():
-    print("Checking if new handshakes required")
     try:
         known_satellites = set(get_known_satellites())
         current_neighbours = set(get_neighbours())
@@ -27,8 +26,8 @@ def send_handshakes():
         return # If there are no known satellites, no need to send handshakes
 
     new_neighbours = known_satellites - current_neighbours
-    print(f"Unknown neighbours are {new_neighbours}")
-    print(f"Known neighbours are {current_neighbours}")
+    # print(f"Unknown neighbours are {new_neighbours}")
+    # print(f"Known neighbours are {current_neighbours}")
     for neighbour in new_neighbours:
         send_handshake(neighbour)
 
@@ -57,8 +56,6 @@ def send_handshake(neighbour):
             bobb = BobbHeaders()
             bobb_header = bobb.parse_header(bytes.fromhex(resp.headers.get(X_BOBB_HEADER)))
             write_received_handshake(data, bobb_header)
-
-            print(f"Dealt with handshake response!")
     
 def get_known_satellites():
     ip_port_pairs = []

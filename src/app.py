@@ -18,7 +18,6 @@ import atexit
 
 device_function = os.getenv("DEVICE_FUNCTION")
 port = int(os.getenv("PORT"))
-print(f"Port: {port}")
 
 name = load_from_config_file(device_function, port)["name"]
 generate_keys(name)

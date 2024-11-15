@@ -30,7 +30,7 @@ def write_received_handshake(handshake_data, bobb_header):
     source_ip = bobb_header["source_ipv4"]
 
     # Extract necessary fields from the handshake data
-    print(handshake_data)
+
     device_function = handshake_data["device_function"]
     public_key = handshake_data["public_key"]
     source_port = handshake_data["port"]

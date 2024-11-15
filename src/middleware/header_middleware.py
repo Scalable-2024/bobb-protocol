@@ -40,8 +40,8 @@ def check_headers():
    # else:
         #return create_response({"error": ERROR_INVALID_OPTIONAL_HEADER}, 400)
 
-    print(f"Bobb Header: {g.bobb_header}")
-    print(f"Bobb Optional Header: {g.bobb_optional_header}")
+    # print(f"Bobb Header: {g.bobb_header}")
+    # print(f"Bobb Optional Header: {g.bobb_optional_header}")
 
     # If headers are valid
     return True

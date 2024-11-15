@@ -50,7 +50,6 @@ def check_device_type(ipv4, port, endpoint, verbose):
             if verbose:
                 print(f"HTTP 200 OK from {addr}")
             data = resp.json()['data']
-            print(f"Data: {data}")
             if data in valid_functions:
                 return data
             
@@ -60,7 +59,7 @@ def check_device_type(ipv4, port, endpoint, verbose):
             print(f"Got error: {e}")
         return None
     
-def find_x_satellites(ips_to_check=["172.31.116.126"], min_port=33001, max_port=33100, endpoint="id", x=5):
+def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5):
     results = []
 
     # Default list of ips to check - raspberry pi IPs

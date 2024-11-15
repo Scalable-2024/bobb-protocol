@@ -26,14 +26,11 @@ def load_from_config_file(function, port):
     return create_config(function, port)
 
 def create_config(function, port):
-    print(f"Port before creating config: {port}")
     if function in valid_functions:
         pass
     else:
         logging.error("Invalid satellite function")
         exit()
-
-    print(f"Creating config with function: {function}")
 
     config = {
         "name": generate_name(port),

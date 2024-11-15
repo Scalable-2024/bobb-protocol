@@ -15,7 +15,6 @@ def handshake():
     return handle_handshake(handshake_data, bobb_header)
 
 def handle_handshake(handshake_data, bobb_header):
-    print("About to receive handshakes")
     write_received_handshake(handshake_data, bobb_header)
 
     # Send handshake back
