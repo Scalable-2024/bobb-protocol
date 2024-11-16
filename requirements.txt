@@ -7,3 +7,6 @@ flask-Cors
 httpx
 setuptools
 rsa
+requests
+APScheduler
+cryptography

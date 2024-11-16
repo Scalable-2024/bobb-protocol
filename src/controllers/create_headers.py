@@ -12,9 +12,9 @@ def create_header():
         version_major = necessary_header["version_major"]
         version_minor = necessary_header["version_minor"]
         message_type = necessary_header["message_type"]
-        dest_ipv6 = necessary_header["dest_ipv6"]
+        dest_ipv4 = necessary_header["dest_ipv4"]
         dest_port = necessary_header["dest_port"]
-        source_ipv6 = necessary_header["source_ipv6"]
+        source_ipv4 = necessary_header["source_ipv4"]
         source_port = necessary_header["source_port"]
         sequence_number = necessary_header["sequence_number"]
         timestamp = necessary_header["timestamp"]
@@ -24,9 +24,9 @@ def create_header():
             version_major=version_major,
             version_minor=version_minor,
             message_type=message_type,
-            dest_ipv6=dest_ipv6,
+            dest_ipv4=dest_ipv4,
             dest_port=dest_port,
-            source_ipv6=source_ipv6,
+            source_ipv4=source_ipv4,
             source_port=source_port,
             sequence_number=sequence_number,
             timestamp=timestamp

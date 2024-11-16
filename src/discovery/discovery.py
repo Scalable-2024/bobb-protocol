@@ -1,8 +1,13 @@
 import argparse
+import logging
 import subprocess
 import re
 import csv
 import requests
+import os
+import random
+import re
+from src.config.config import valid_functions
 
 # TODO allow self signed certificates
 import urllib3
@@ -13,11 +18,6 @@ proxies = {
   'http': '',
   'https': '',
 }
-
-
-def ipv4_to_ipv6(ipv4):
-    """Convert an IPv4 address to IPv6 using the ::ffff: method."""
-    return "::ffff:{}".format(ipv4)
 
 
 def ping_with_response_time(ipv4, timeout=1):
@@ -37,56 +37,85 @@ def ping_with_response_time(ipv4, timeout=1):
         return None  # Ping failed or timeout
 
 
-def check_if_satellite(ipv4, port, endpoint):
+def check_device_type(ipv4, port, endpoint, verbose):
     """Make an HTTP request using curl and return the response message if status code is 200."""
     try:
         # Log to indicate progress
         addr = f"https://{ipv4}:{port}/{endpoint}"
-        print(f"Attempting HTTP request to {addr}...")
+        if verbose:
+            print(f"Attempting HTTP request to {addr}...")
         # TODO: Allow self signed certificates
         resp = requests.get(addr, verify=False, timeout=3, proxies=proxies)
         # Check the HTTP status code and response
         if resp.status_code == 200:
-            print(f"HTTP 200 OK from {addr}")
-            json = resp.json()
-            if json["data"] == "I am a satellite":
-                return True
-            else:
-                print(f"{addr} is responding, but is not verified to be a bobb satellite - {json['data']} does not equal 'I am a satellite'")
-        return False
+            if verbose:
+                print(f"HTTP 200 OK from {addr}")
+            function = resp.json()['data']
+            if function in valid_functions:
+                return function
+            
+        return None
     except Exception as e:
-        print(f"Got error: {e}")
-        return False
-
-
-def main(ping_ip, port, output_csv, endpoint):
+        if verbose:
+            print(f"Got error: {e}")
+        return None
+    
+def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5, port=None):
     results = []
-    for ip in range(1, 50):  # Example scan of 50 IPs, adjust range as needed
-        ipv4 = "{}.{}".format(ping_ip, ip)
-        print(f"Pinging {ipv4}...")
-        response_time = ping_with_response_time(ipv4)
+
+    print(ips_to_check)
+
+    # Default list of ips to check - raspberry pi IPs
+    if ips_to_check is None:
+        ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+        # ips_to_check = ["localhost"] # <- for local testing
+
+    for ip in ips_to_check:
+        response_time = ping_with_response_time(ip)
+        print(f"Response time for {ip}: {response_time}")
         if response_time is not None:
-            print(f"{ipv4} is active. Fetching HTTP response...")
-            ipv6 = ipv4_to_ipv6(ipv4)
-            is_satellite = check_if_satellite(ipv4, port, endpoint)
-            results.append({
-                "IPv4": ipv4,
-                "IPv6": ipv6,
-                "Response Time (ms)": response_time,
-                "Is a satellite?": is_satellite
-            })
-        else:
-            print(f"{ipv4} did not respond. Skipping HTTP request.")
-    # Sort results by response time
-    sorted_results = sorted(results, key=lambda x: x["Response Time (ms)"])
-    # Write results to CSV
-    with open(output_csv, "w", newline="") as csvfile:
-        fieldnames = ["IPv4", "IPv6", "Response Time (ms)", "Is a satellite?"]
+            for queried_port in range(min_port, max_port + 1):
+                if queried_port == port:
+                    print(f"Skipping port {queried_port} as that is our own port.")
+                    continue
+                function = check_device_type(ip, queried_port, endpoint, verbose=False)
+                # The only case we care about is when the IP and port are valid
+                if function is not None:
+                    print(f"Found {ip}:{queried_port} with function {function}")
+                    results.append({
+                        "IPv4": ip,
+                        "Port": queried_port,
+                        "Response Time": response_time,
+                        "Device Function": function,
+                    })
+    
+    # Randomly select x satellites from the results
+    if len(results) > x:
+        selected_results = random.sample(results, x)
+    else:
+        # If there are fewer than x results, return all of them
+        selected_results = results
+
+    return selected_results
+
+# Note that this is finding the list of potential satellites, outside of the simulation.
+# This is because we need the ip addresses to simulate communication.
+# It should return the intended neighbour satellites - for now, just the ones with the lowest latency.
+def get_neighbouring_satellites():
+    port = os.getenv("PORT")
+    starter_satellite_list = find_x_satellites(x=5, port=int(port))
+
+    base_dir = os.getcwd()
+    directory_path = os.path.join(base_dir, "resources", "satellite_listings")
+    file_name = os.path.join(directory_path, f"full_satellite_listing_{port}.csv")
+    os.makedirs(directory_path, exist_ok=True)
+
+    with open(file_name, "w", newline="") as csvfile:
+        print(f"Writing to {file_name}")
+        fieldnames = ["IPv4", "Port", "Response Time", "Device Function"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
-        writer.writerows(sorted_results)
-    print(f"CSV file '{output_csv}' has been created.")
-
+        writer.writerows(starter_satellite_list)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
