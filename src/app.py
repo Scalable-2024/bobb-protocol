@@ -1,4 +1,5 @@
 import argparse
+import logging
 import time
 import threading
 import os
@@ -39,6 +40,7 @@ scheduler.add_job(func=send_handshakes, trigger=IntervalTrigger(seconds=30), id=
 
 def initial_satellite_search():
     time.sleep(2)
+    print("Initial satellite search")
     get_neighbouring_satellites()
 
 thread = threading.Thread(target=initial_satellite_search)

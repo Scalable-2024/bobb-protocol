@@ -1,4 +1,5 @@
 import argparse
+import logging
 import subprocess
 import re
 import csv
@@ -49,9 +50,9 @@ def check_device_type(ipv4, port, endpoint, verbose):
         if resp.status_code == 200:
             if verbose:
                 print(f"HTTP 200 OK from {addr}")
-            data = resp.json()['data']
-            if data in valid_functions:
-                return data
+            function = resp.json()['data']
+            if function in valid_functions:
+                return function
             
         return None
     except Exception as e:
@@ -59,23 +60,31 @@ def check_device_type(ipv4, port, endpoint, verbose):
             print(f"Got error: {e}")
         return None
     
-def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5):
+def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5, port=None):
     results = []
+
+    print(ips_to_check)
 
     # Default list of ips to check - raspberry pi IPs
     if ips_to_check is None:
         ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+        # ips_to_check = ["localhost"] # <- for local testing
 
     for ip in ips_to_check:
         response_time = ping_with_response_time(ip)
+        print(f"Response time for {ip}: {response_time}")
         if response_time is not None:
-            for port in range(min_port, max_port+1):
-                function = check_device_type(ip, port, endpoint, verbose=False)
+            for queried_port in range(min_port, max_port + 1):
+                if queried_port == port:
+                    print(f"Skipping port {queried_port} as that is our own port.")
+                    continue
+                function = check_device_type(ip, queried_port, endpoint, verbose=False)
                 # The only case we care about is when the IP and port are valid
                 if function is not None:
+                    print(f"Found {ip}:{queried_port} with function {function}")
                     results.append({
                         "IPv4": ip,
-                        "Port": port,
+                        "Port": queried_port,
                         "Response Time": response_time,
                         "Device Function": function,
                     })
@@ -93,21 +102,20 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
 # This is because we need the ip addresses to simulate communication.
 # It should return the intended neighbour satellites - for now, just the ones with the lowest latency.
 def get_neighbouring_satellites():
-    starter_satellite_list = find_x_satellites(x=5)
-
     port = os.getenv("PORT")
+    starter_satellite_list = find_x_satellites(x=5, port=int(port))
+
     base_dir = os.getcwd()
     directory_path = os.path.join(base_dir, "resources", "satellite_listings")
     file_name = os.path.join(directory_path, f"full_satellite_listing_{port}.csv")
     os.makedirs(directory_path, exist_ok=True)
 
     with open(file_name, "w", newline="") as csvfile:
+        print(f"Writing to {file_name}")
         fieldnames = ["IPv4", "Port", "Response Time", "Device Function"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(starter_satellite_list)
-
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

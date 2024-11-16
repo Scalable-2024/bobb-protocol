@@ -2,7 +2,6 @@ import os
 import csv
 import json
 import requests
-from src.utils.handshake_body import SatelliteHandshake
 from src.utils.headers.necessary_headers import BobbHeaders
 from src.config.constants import X_BOBB_HEADER
 from src.config.config import CONFIG_FILE_PATH
@@ -35,7 +34,6 @@ def send_handshakes():
 def send_handshake(neighbour):
     n_ip, n_port = neighbour
 
-    
     ip = os.getenv("IP")
     port = int(os.getenv("PORT"))
 
@@ -97,6 +95,3 @@ def get_neighbours():
     ip_port_combinations = [(neighbor["ip"], neighbor["port"]) for neighbor in neighbors]
 
     return ip_port_combinations
-
-
-
