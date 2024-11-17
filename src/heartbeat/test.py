@@ -12,7 +12,7 @@ app = Flask(__name__)
 our_port = os.getenv("PORT")
 
 # ******** Remove THIS WHEN ACTUALLY RUNNING *****
-our_port = 33001
+our_port = 33002
 our_ip = "192.168.0.235" 
 
 neighbours_file = f'resources/satellite_neighbours/neighbours_{our_port}.json'
