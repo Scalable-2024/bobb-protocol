@@ -39,8 +39,40 @@ def update_last_contact(ip, port):
 
 @app.route("/heartbeat", methods=["POST"])
 def receive_heartbeat():
-    print("Heartbeat received")
-    return jsonify({"message": "Heartbeat received"}), 200
+    received_constellation = request.json.get("constellation", {}) if request.json else {}
+    
+    # Load our existing constellation data
+    constellation_file = f'resources/satellite_constellation_set/constellation_{our_port}.json'
+    try:
+        with open(constellation_file, 'r') as f:
+            our_constellation = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        our_constellation = {}
+    
+    # Update constellation data based on received information
+    for node_id, node_data in received_constellation.items():
+        # If node doesn't exist in our constellation, add it
+        if node_id not in our_constellation:
+            our_constellation[node_id] = node_data
+        # If node exists and received data is fresher
+        elif node_data['freshness'] > our_constellation[node_id]['freshness']:
+            # Compare neighbours data excluding freshness
+            current_neighbours = our_constellation[node_id]['neighbours']
+            new_neighbours = node_data['neighbours']
+            
+            if current_neighbours != new_neighbours:
+                # Update entire node data if there are changes
+                our_constellation[node_id] = node_data
+            else:
+                # Only update freshness if no other changes
+                our_constellation[node_id]['freshness'] = node_data['freshness']
+    
+    # Save the updated constellation data
+    with open(constellation_file, 'w') as f:
+        json.dump(our_constellation, f, indent=4)
+        
+    print("Constellation data updated and saved")
+    return jsonify({"message": "Constellation data processed"}), 200
 
 
 def send_heartbeat_to_neighbours():
@@ -91,22 +123,24 @@ def send_heartbeat_to_neighbours():
             # Write to the file
             with open(constellation_file, 'w') as f:
                 json.dump(satellite_data, f, indent=4)
+
+            # Assign the initial data to constellation_data
+            constellation_data = satellite_data
         else:
-            print('file exists !!!')
             # File exists, read the existing data
             with open(constellation_file, 'r') as f:
                 constellation_data = json.load(f)
-            
+
             # Our satellite ID
             satellite_id = f"{our_ip}:{our_port}"
             current_time = int(time.time())
-            
+
             # Update our satellite's neighbours
             constellation_data[satellite_id] = {
                 "freshness": current_time,
                 "neighbours": neighbours
             }
-            
+
             # Write the updated constellation data back to the JSON file
             with open(constellation_file, 'w') as f:
                 json.dump(constellation_data, f, indent=4)
@@ -114,7 +148,8 @@ def send_heartbeat_to_neighbours():
         # Send POST requests to all neighbour URLs
         for url in neighbour_urls:
             try:
-                response = requests.post(url, json={"neighbours": neighbours})
+                # response = requests.post(url, json={"neighbours": neighbours})
+                response = requests.post(url, json={"constellation": constellation_data})
                 if response.status_code == 200:
                     print(f"Heartbeat sent successfully to {url}")
                     
