@@ -7,6 +7,7 @@ import requests
 import os
 import random
 import re
+import json
 from src.config.config import valid_functions
 
 # TODO allow self signed certificates
@@ -19,7 +20,17 @@ proxies = {
   'https': '',
 }
 
+def load_city_locations():
+    """Load city location data from JSON file."""
+    with open("basestation/routers/satellites.json", "r") as file:
+        data = json.load(file)
+    return data["satellites"]
 
+def get_random_city():
+    """Select a random city from the loaded locations."""
+    cities = load_city_locations()
+    return random.choice(cities)
+  
 def ping_with_response_time(ipv4, timeout=1):
     """Ping an IPv4 address and return the response time in ms."""
     try:
