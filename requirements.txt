@@ -11,4 +11,3 @@ requests
 APScheduler
 cryptography
 networkx
-matplotlib
