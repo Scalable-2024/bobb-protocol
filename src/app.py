@@ -42,9 +42,9 @@ scheduler.add_job(func=send_handshakes, trigger=IntervalTrigger(seconds=30), id=
 
 # Schedule heartbeat every 30s
 time.sleep(3) # Sleep for 3 seconds to allow the satellite to discover its neighbours
-scheduler.add_job(func=send_heartbeat_to_neighbours, trigger=IntervalTrigger(seconds=15), id='sending_heartbeats', replace_existing=True)
+scheduler.add_job(func=send_heartbeat_to_neighbours, trigger=IntervalTrigger(seconds=30), id='sending_heartbeats', replace_existing=True)
 # Addition and removal of neighbours to mimic movement 
-scheduler.add_job(func=manage_neighbours, trigger=IntervalTrigger(seconds=18), id='managing neighbours', replace_existing=True)
+scheduler.add_job(func=manage_neighbours, trigger=IntervalTrigger(seconds=60), id='managing neighbours', replace_existing=True)
 
 
 def initial_satellite_search():
