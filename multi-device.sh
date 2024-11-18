@@ -22,14 +22,14 @@ fi
 
 # Validate the number of instances argument
 if [ -z "$1" ] || [ "$1" -lt 1 ] || [ "$1" -gt 100 ]; then
-    echo "Usage: $0 <number between 1 and 100> <DEVICE_FUNCTION> [START_PORT] <RESET_RESOURCES>"
+    echo "Usage: $0 <number between 1 and 100> <DEVICE_FUNCTION> <RESET_RESOURCES> [START_PORT]"
     exit 1
 fi
 
 # Check if DEVICE_FUNCTION is provided
 DEVICE_FUNCTION=$2
 if [ -z "$DEVICE_FUNCTION" ]; then
-    echo "Usage: $0 <number between 1 and 100> <DEVICE_FUNCTION> [START_PORT] <RESET_RESOURCES>"
+    echo "Usage: $0 <number between 1 and 100> <DEVICE_FUNCTION> <RESET_RESOURCES> [START_PORT]"
     exit 1
 fi
 
@@ -39,11 +39,27 @@ if [ -z "$START_PORT" ]; then
     START_PORT=33001
 fi
 
+# Check if Rust is installed
+if ! rustc --version &> /dev/null; then
+    echo "Rust is not installed. Installing Rust..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --profile default -y 
+    . $HOME/.cargo/env
+    # Verify the installation
+    if rustc --version &> /dev/null; then
+        echo "Rust has been installed successfully."
+    else
+        echo "Rust installation failed. Exiting."
+        exit 1
+    fi
+fi
+
+. $HOME/.cargo/env
+
 # Run the original script the specified number of times with ports incrementing from START_PORT
 i=0
 while [ "$i" -lt "$1" ]; do
     port=$((START_PORT + i))
-    ./run.sh "$port" "$DEVICE_FUNCTION" &
+    bash run.sh "$port" "$DEVICE_FUNCTION" &
     i=$((i + 1))
 done
 
