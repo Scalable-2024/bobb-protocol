@@ -39,10 +39,12 @@ if [ -z "$START_PORT" ]; then
     START_PORT=33001
 fi
 
+
 # Check if Rust is installed
+. $HOME/.cargo/env
 if ! rustc --version &> /dev/null; then
     echo "Rust is not installed. Installing Rust..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --profile default -y 
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --profile default -y &> /dev/null;
     . $HOME/.cargo/env
     # Verify the installation
     if rustc --version &> /dev/null; then
@@ -52,8 +54,6 @@ if ! rustc --version &> /dev/null; then
         exit 1
     fi
 fi
-
-. $HOME/.cargo/env
 
 # Run the original script the specified number of times with ports incrementing from START_PORT
 i=0
