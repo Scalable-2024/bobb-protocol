@@ -5,13 +5,14 @@ import threading
 import os
 from flask import Flask, request, g
 from src.config.config import load_from_config_file
+from src.heartbeat.heartbeat import send_heartbeat_to_neighbours
 from src.routers.__main__ import router as main_router
 from src.utils.crypto_utils import generate_keys
 from src.utils.headers.necessary_headers import BobbHeaders
 from src.utils.headers.optional_header import BobbOptionalHeaders
 from src.helpers.response_helper import create_response
 from src.config.constants import X_BOBB_HEADER, X_BOBB_OPTIONAL_HEADER, ERROR_INVALID_BOBB_HEADER, ERROR_INVALID_OPTIONAL_HEADER
-from src.discovery.discovery import get_neighbouring_satellites
+from src.discovery.discovery import get_neighbouring_satellites, get_random_city
 from src.helpers.send_handshake_helper import send_handshakes
 from src.helpers.send_location_helper import send_location
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -58,8 +59,24 @@ def initial_satellite_search():
     print("Initial satellite search")
     get_neighbouring_satellites()
 
+def schedule_activities_once_started_up():
+    # Wait 4s to allow initial startup and discovery
+    time.sleep(3)
+
+    # Schedule satellite discovery every 5 minutes
+    scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(minutes=5), id='device_discovery', replace_existing=True)
+
+    # Schedule handshaking every 30s
+    scheduler.add_job(func=send_handshakes, trigger=IntervalTrigger(seconds=30), id='sending_handshakes', replace_existing=True)
+
+    # Schedule heartbeat every 30s
+    scheduler.add_job(func=send_heartbeat_to_neighbours, trigger=IntervalTrigger(seconds=30), id='sending_heartbeats', replace_existing=True)
+
 thread = threading.Thread(target=initial_satellite_search)
 thread.start()
+
+schedule_thread = threading.Thread(target=schedule_activities_once_started_up)
+schedule_thread.start()
 
 @app.before_request
 def add_custom_headers_to_request():
