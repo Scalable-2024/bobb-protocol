@@ -302,7 +302,7 @@ def generate_all_routes(constellation_file: str) -> Dict[str, Dict[str, List[Rou
                 )
 
     # Generate visualizations
-    generator.visualize_routes(routes, "resources/route_visualizations")
+    # generator.visualize_routes(routes, "resources/route_visualizations")
 
     return routes
 
