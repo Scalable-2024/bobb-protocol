@@ -6,15 +6,22 @@ import csv
 import os
 import random
 import ssl
+import time
 import urllib3
 import requests  # For HTTPS requests with SSL context
 from requests.adapters import HTTPAdapter
 from urllib3.poolmanager import PoolManager
-from bobb.src.config.config import valid_functions
-
+from src.config.config import valid_functions
+from src.helpers.send_handshake_helper import send_handshakes
 
 # Disable warnings about insecure SSL requests
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# To block the SCSS proxying, to connect directly to the other Pis
+proxies = {
+    'http': '',
+    'https': '',
+}
 
 # Create an SSL context to allow self-signed certificates
 ssl_context = ssl.create_default_context()
@@ -35,17 +42,12 @@ class SSLAdapter(HTTPAdapter):
 session = requests.Session()
 session.mount("https://", SSLAdapter(ssl_context))
 
-# To block the SCSS proxying, to connect directly to the other pis
-proxies = {
-    'http': '',
-    'https': '',
-}
 
 def ping_with_contact_time(ipv4, timeout=1):
-    """Ping an IPv4 address and return the last contact time as a UNIX timestamp"""
+    """Ping an IPv4 address and return the last contact time as a UNIX timestamp."""
     try:
         output = subprocess.check_output(
-            "ping -c 1 -W {} {}".format(timeout, ipv4),
+            f"ping -c 1 -W {timeout} {ipv4}",
             shell=True,
             text=True,
             stderr=subprocess.DEVNULL
@@ -56,6 +58,7 @@ def ping_with_contact_time(ipv4, timeout=1):
         return None
     except subprocess.CalledProcessError:
         return None  # Ping failed or timeout
+
 
 def check_device_type(ipv4, port, endpoint, verbose):
     """Make an HTTPS request using a custom SSL context for self-signed certificates."""
@@ -71,7 +74,7 @@ def check_device_type(ipv4, port, endpoint, verbose):
         if resp.status_code == 200:
             if verbose:
                 print(f"HTTP 200 OK from {addr}")
-            function = resp.text.strip()
+            function = resp.json().get('data', '').strip()
             if function in valid_functions:
                 return function
 
@@ -81,32 +84,28 @@ def check_device_type(ipv4, port, endpoint, verbose):
             print(f"Got error: {e}")
         return None
 
+
 def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5, port=None):
     results = []
 
-    print(ips_to_check)
-
     ip = os.getenv("IP")
-    # If on a private IP address, assume raspberry pis
+    # If on a private IP address, assume Raspberry Pis
     if ip.split('.')[0] == "10":
-        # Default list of ips to check - raspberry pi IPs
+        # Default list of IPs to check - Raspberry Pi IPs
         if ips_to_check is None:
-            ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+            ips_to_check = [f"10.35.70.{ext}" for ext in range(1, 50)]
     else:
-        ips_to_check = ["localhost"] # <- for local testing
+        ips_to_check = ["localhost"]  # For local testing
 
     for ip in ips_to_check:
         contact_time = ping_with_contact_time(ip)
-        print(f"Time of last contact for {ip}: {contact_time}")
         if contact_time is not None:
             for queried_port in range(min_port, max_port + 1):
                 if queried_port == port:
-                    print(f"Skipping port {queried_port} as that is our own port.")
                     continue
                 function = check_device_type(ip, queried_port, endpoint, verbose=False)
                 # The only case we care about is when the IP and port are valid
                 if function is not None:
-                    print(f"Found {ip}:{queried_port} with function {function}")
                     results.append({
                         "IPv4": ip,
                         "Port": queried_port,
@@ -127,6 +126,7 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
 # This is because we need the ip addresses to simulate communication.
 # It should return the intended neighbour satellites - for now, just the ones with the lowest latency.
 def get_neighbouring_satellites():
+    """Find and save a list of neighboring satellites."""
     port = os.getenv("PORT")
     starter_satellite_list = find_x_satellites(x=5, port=int(port))
 
@@ -136,9 +136,9 @@ def get_neighbouring_satellites():
     os.makedirs(directory_path, exist_ok=True)
 
     with open(file_name, "w", newline="") as csvfile:
-        print(f"Writing to {file_name}")
         fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(starter_satellite_list)
 
+    send_handshakes()
