@@ -277,6 +277,11 @@ def manage_neighbours():
             # Remove the first satellite from the to_be_discovered list
             new_neighbour = to_be_discovered.pop(0)
             print(f"[DEBUG] Adding new neighbour from to_be_discovered: {new_neighbour}")
+          
+            # Extract IP and port for the new neighbour
+            n_ip, n_port = new_neighbour["ip"], new_neighbour["port"]
+            # Send handshake to the new neighbour
+            send_handshake((n_ip, n_port))
 
             # Append the new neighbour to the neighbours list
             neighbours.append(new_neighbour)
