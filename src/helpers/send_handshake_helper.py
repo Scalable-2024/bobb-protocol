@@ -30,7 +30,6 @@ def send_handshakes():
     for neighbour in new_neighbours:
         send_handshake(neighbour)
 
-
 def send_handshake(neighbour):
     n_ip, n_port = neighbour
 

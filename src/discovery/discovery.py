@@ -109,7 +109,7 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
 # It should return the intended neighbour satellites - for now, just the ones with the lowest latency.
 def get_neighbouring_satellites():
     port = os.getenv("PORT")
-    starter_satellite_list = find_x_satellites(x=5, port=int(port))
+    starter_satellite_list = find_x_satellites(port=int(port))
 
     base_dir = os.getcwd()
     directory_path = os.path.join(base_dir, "resources", "satellite_listings")
