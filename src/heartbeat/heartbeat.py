@@ -83,8 +83,11 @@ def heartbeat():
 
 def send_heartbeat_to_neighbours():
     # Load neighbours from the JSON file
-    with open(neighbours_file) as f:
-        raw_neighbours = json.load(f)
+    try:
+        with open(neighbours_file) as f:
+            raw_neighbours = json.load(f)
+    except FileNotFoundError:
+        return # If no neighbours, we don't care
     
     # Initialize neighbours dictionary from the provided JSON format
     neighbours = {}
