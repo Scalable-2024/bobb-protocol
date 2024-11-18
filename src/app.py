@@ -41,6 +41,7 @@ def schedule_activities_once_started_up():
     time.sleep(3)
 
     # Schedule satellite discovery every 5 minutes
+    # TODO once testing is done, return to 5 minutes
     scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(minutes=1), id='device_discovery', replace_existing=True)
 
     # Schedule heartbeat every 30s
