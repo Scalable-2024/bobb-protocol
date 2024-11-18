@@ -5,7 +5,6 @@ TARGET_DIR="resources/"
 
 # Check if the RESET_RESOURCES argument is provided and valid
 RESET_RESOURCES=$3
-echo $RESET_RESOURCES
 if [ "$RESET_RESOURCES" = "true" ]; then
     # Check if the target directory exists
     if [ -d "$TARGET_DIR" ]; then

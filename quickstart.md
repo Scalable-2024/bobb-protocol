@@ -21,3 +21,9 @@ If setting up a full network, start up at least one basestation and and least on
 ### Testing on Localhost
 
 If testing locally and your IP address does not start with 10, run the code as normal, and simulated devices will communicate cross ports. Otherwise, modify the definition of `find_x_satellites` in `src/discovery/discovery.py` to set the default value of `ìps_to_check` to `["localhost"]`.
+
+## Group 1 Specific
+
+```sh
+python3 -m src.whale.simulate --min_diving_time=5 --max_diving_time=10 --min_surface_time=2 --max_surface_time=5 --destination_ip="172.32.116.126" --destination_port=33002
+```
