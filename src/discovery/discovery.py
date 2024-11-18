@@ -12,6 +12,9 @@ from src.config.config import valid_functions
 
 # TODO allow self signed certificates
 import urllib3
+
+from src.helpers.send_handshake_helper import send_handshakes
+
 urllib3.disable_warnings()
 
 # To block the SCSS proxying, to connect directly to the other pis
@@ -64,25 +67,27 @@ def check_device_type(ipv4, port, endpoint, verbose):
 def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33030, endpoint="id", x=10, port=None): #33100 to
     results = []
 
-    print(ips_to_check)
-
-    # Default list of ips to check - raspberry pi IPs
-    if ips_to_check is None:
-        # ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
-        ips_to_check = ["localhost"] # <- for local testing
+    ip = os.getenv("IP")
+    # If on a private IP address, assume raspberry pis
+    # if ip.split('.')[0] == "10":
+    #     # Default list of ips to check - raspberry pi IPs
+    #     if ips_to_check is None:
+    #         ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+    # else:
+    ips_to_check = ["localhost"]  # <- for local testing
 
     for ip in ips_to_check:
         contact_time = ping_with_contact_time(ip)
-        print(f"Time of last contact for {ip}: {contact_time}")
+        # print(f"Time of last contact for {ip}: {contact_time}")
         if contact_time is not None:
             for queried_port in range(min_port, max_port + 1):
                 if queried_port == port:
-                    print(f"Skipping port {queried_port} as that is our own port.")
+                    # print(f"Skipping port {queried_port} as that is our own port.")
                     continue
                 function = check_device_type(ip, queried_port, endpoint, verbose=False)
                 # The only case we care about is when the IP and port are valid
                 if function is not None:
-                    print(f"Found {ip}:{queried_port} with function {function}")
+                    # print(f"Found {ip}:{queried_port} with function {function}")
                     results.append({
                         "IPv4": ip,
                         "Port": queried_port,
@@ -105,9 +110,8 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33030, endpoin
 def get_neighbouring_satellites():
     # Get the port number from the environment variable
     port = os.getenv("PORT")
-    if not port:
-        raise ValueError("PORT environment variable is not set.")
-    print(f"[DEBUG] PORT environment variable is set to: {port}")
+
+    #starter_satellite_list = find_x_satellites(port=int(port))
 
     # Find a list of 20 potential satellites using the specified port
     print("[DEBUG] Starting satellite discovery...")
@@ -168,26 +172,5 @@ def get_neighbouring_satellites():
     except Exception as e:
         print(f"[ERROR] Failed to write to_be_discovered list: {e}")
 
-
-    # with open(file_name, "w", newline="") as csvfile:
-    #     print(f"Writing to {file_name}")
-    #     fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
-    #     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    #     writer.writeheader()
-    #     writer.writerows(starter_satellite_list)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Ping sweep for a given network and save results to CSV.")
-    parser.add_argument("--ping_ip", default="10.35.70",
-                        help="Base IP address for ping (e.g., 192.168.1)")
-    parser.add_argument("--port", default=33001,
-                        help="Port which will serve satellite identification")
-    parser.add_argument("--output_csv", default="results.csv",
-                        help="Output CSV file name (e.g., results.csv)")
-    parser.add_argument('--endpoint', default="id",
-                        help="The endpoint which the satellite serves its identification on - eg /id")
-    args = parser.parse_args()
-    main(args.ping_ip, args.port, args.output_csv, args.endpoint)
+    send_handshakes()
 

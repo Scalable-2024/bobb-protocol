@@ -1,0 +1,9 @@
+# Example request
+curl -X POST http://localhost:33001/route \
+-H "Content-Type: application/json" \
+-d '{
+    "source": "10.6.60.25:33001",
+    "destination": "10.6.60.25:33002",
+    "message": "Hello",
+    "priority": "high"
+}'

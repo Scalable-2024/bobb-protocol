@@ -10,6 +10,7 @@ import csv
 
 
 from src.config.constants import MAX_TIMEOUT, X_BOBB_HEADER
+from src.routing.route_generator import create_routing_tables
 from src.utils.headers.necessary_headers import BobbHeaders
 
 app = Flask(__name__)
@@ -51,22 +52,41 @@ if not os.path.exists(to_be_discovered_csv):
         writer.writerow(["IPv4", "Port", "Contact Time", "Device Function"])  # Write header only
 
 
+def safe_load_json(file_path):
+    """
+    Safely load JSON data from a file.
+    If the file is empty or contains invalid JSON, return an empty dictionary.
+    """
+    try:
+        with open(file_path, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def safe_save_json(file_path, data):
+    """
+    Safely save JSON data to a file, creating directories if necessary.
+    """
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'w') as f:
+        json.dump(data, f, indent=4)
+
 
 def update_last_contact(ip, port):
     """
     Updates the last_contact time for the given neighbour (identified by IP and port)
     in the neighbours_<our_port>.json file.
     """
-    with open(neighbours_file, 'r') as f:
-        neighbours_data = json.load(f)
+
+    neighbours_data = safe_load_json(neighbours_file)
+    
     for neighbour in neighbours_data:
         if neighbour['ip'] == ip and neighbour['port'] == port:
             neighbour['last_contact'] = int(time.time())
             break
-
-    with open(neighbours_file, 'w') as f:
-        json.dump(neighbours_data, f, indent=4)
-
+    
+    safe_save_json(neighbours_file, neighbours_data)
 
 def heartbeat():
     received_constellation = request.json.get("constellation", {}) if request.json else {}
@@ -99,21 +119,23 @@ def heartbeat():
 
 
     # Save the updated constellation data
-    with open(constellation_file, 'w') as f:
-        json.dump(our_constellation, f, indent=4)
 
-    print("Constellation data updated and saved")
+    safe_save_json(constellation_file, our_constellation)
+
+    updated = create_routing_tables()
+
     return jsonify({"message": "Constellation data processed"}), 200
 
 
 def send_heartbeat_to_neighbours():
 
-    # Load neighbours and blocklist from the JSON files
-    with open(neighbours_file) as f:
-        raw_neighbours = json.load(f)
-    with open(blocklist_file, 'r') as f:
-        blocklist = json.load(f)
-
+    # Load neighbours from the JSON file
+    try:
+        with open(neighbours_file) as f:
+            raw_neighbours = json.load(f)
+    except FileNotFoundError:
+        return # If no neighbours, we don't care
+    
     # Initialize neighbours dictionary from the provided JSON format
     neighbours = {}
     current_time = int(time.time())
@@ -131,11 +153,11 @@ def send_heartbeat_to_neighbours():
                 "last_contact": neighbour["last_contact"],
             }
 
-            # neighbour_urls.add(f'https://{neighbour["ip"]}:{neighbour["port"]}/heartbeat')
-            neighbour_urls.add(f'https://192.168.0.235:{neighbour["port"]}/heartbeat')
+            neighbour_urls.add(f'https://{neighbour["ip"]}:{neighbour["port"]}/heartbeat')
+            # neighbour_urls.add(f'https://192.168.0.235:{neighbour["port"]}/heartbeat')
     
-    print(f"Neighbours : {neighbours}")
-    print(f'Neighbours urls: {neighbour_urls}')
+    # print(f"Neighbours : {neighbours}")
+    # print(f'Neighbours urls: {neighbour_urls}')
     
     # Define directory and file paths
     constellation_dir = 'resources/satellite_constellation_set'
@@ -158,16 +180,14 @@ def send_heartbeat_to_neighbours():
             }
         }
         # Write to the file
-        with open(constellation_file, 'w') as f:
-            json.dump(satellite_data, f, indent=4)
-
+        safe_save_json(constellation_file, satellite_data)
+        
         # Assign the initial data to constellation_data
         constellation_data = satellite_data
     else:
         # File exists, read the existing data
-        with open(constellation_file, 'r') as f:
-            constellation_data = json.load(f)
-
+        constellation_data = safe_load_json(constellation_file)
+        
         # Our satellite ID
         satellite_id = f"{our_ip}:{our_port}"
         current_time = int(time.time())
@@ -179,8 +199,7 @@ def send_heartbeat_to_neighbours():
         }
 
         # Write the updated constellation data back to the JSON file
-        with open(constellation_file, 'w') as f:
-            json.dump(constellation_data, f, indent=4)
+        safe_save_json(constellation_file, constellation_data)
                 
     # Send POST requests to all neighbour URLs
     for url in neighbour_urls:
@@ -190,8 +209,6 @@ def send_heartbeat_to_neighbours():
             headers = {
                 X_BOBB_HEADER: header,
             }
-
-            print(f"Sending heartbeat to {url} with headers: {headers}")
 
             # Send handshake
             response = requests.post(

@@ -1,4 +1,6 @@
+from flask import Blueprint, app, jsonify, request  # Add request here
 import base64
+import json
 import os
 
 from flask import Blueprint, app, jsonify
@@ -10,8 +12,86 @@ from src.controllers.identify import return_identity
 from src.controllers.handshake import handshake
 from src.heartbeat.heartbeat import heartbeat
 from src.middleware.header_middleware import check_headers
+from enum import Enum
+from typing import Dict, List, Optional, Tuple
+from src.routing.find_best_route import find_best_route
+
+
 
 router = Blueprint('main', __name__)
+
+
+# In routers/__main__.py
+
+# Add this import at the top with your other imports
+
+
+class RouteType(Enum):
+    DIRECT = 4
+    FUNCTION = 3
+    BALANCED = 2
+    RANDOM = 1
+
+
+@router.route('/route', methods=['POST'])
+def route_message():
+    """
+    Route a message between satellites.
+    Expected POST body: {
+        "source": "ip:port",
+        "destination": "ip:port",
+        "message": "message content",
+        "priority": "high/medium/low" (optional)
+    }
+    """
+    try:
+        body = request.get_json()
+
+        # Validate request body
+        if not all(k in body for k in ["source", "destination", "message"]):
+            return jsonify({
+                "status": "error",
+                "message": "Missing required fields: source, destination, message",
+                "status_code": 400
+            }), 400
+
+        source = body["source"]
+        destination = body["destination"]
+        message = body["message"]
+        priority = body.get("priority", "medium")
+
+        # Get route based on priority and weights
+        route_info = find_best_route(source, destination, priority)
+
+        if not route_info:
+            return jsonify({
+                "status": "error",
+                "message": f"No route found between {source} and {destination}",
+                "status_code": 404
+            }), 404
+
+        return jsonify({
+            "status": "success",
+            "data": {
+                "source": source,
+                "destination": destination,
+                "selected_route": route_info["path"],
+                "route_type": route_info["type"],
+                "route_metrics": route_info["metrics"],
+                "routing_table": route_info["routing_table"]
+            },
+            "status_code": 200
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Error processing route request: {str(e)}",
+            "status_code": 500
+        }), 500
+
+
+
 
 @router.route('/', methods=['GET'])
 def root():
@@ -47,6 +127,8 @@ def receive_heartbeat():
 
     # Call controller function if headers are valid
     return heartbeat()
+
+
 
 # Base station routes
 

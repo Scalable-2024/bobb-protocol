@@ -35,4 +35,3 @@ if __name__ == "__main__":
 
     # Generate the binary header and convert it to hex for HTTP transmission
     hex_header = leo_header.build_optional_header().hex()
-    print(f"Generated LEOOptionalHeader Hex: {hex_header}")

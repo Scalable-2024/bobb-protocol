@@ -29,4 +29,3 @@ class Bob2Headers:
 
 # Generate the custom header value
 header = Bob2Headers().build_header()
-print(header)
