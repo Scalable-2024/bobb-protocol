@@ -26,3 +26,6 @@ SATELLITE_FUNCTION_DISASTER_IMAGING = "disaster-imaging"
 SATELLITE_FUNCTION_WHALE_TRACKING = "whale-tracking"
 SATELLITE_FUNCTION_WINDFARM_MONITORING = "windfarm-monitoring"
 SATELLITE_FUNCTION_POST_FLOOD_SURVIVOR_DETECTION_AERIALDRONES = "post-flood-survivor-detection-aerialdrones"
+
+# Timeout limit for neighbour last contact (90 seconds)
+MAX_TIMEOUT = 90
