@@ -7,7 +7,7 @@ import requests
 import os
 import random
 import re
-import json
+import time
 from src.config.config import valid_functions
 
 # TODO allow self signed certificates
@@ -20,19 +20,22 @@ proxies = {
   'https': '',
 }
 
-def load_city_locations():
-    """Load city location data from JSON file."""
-    with open("basestation/routers/satellites.json", "r") as file:
-        data = json.load(file)
-    return data["satellites"]
-
 def get_random_city():
-    """Select a random city from the loaded locations."""
-    cities = load_city_locations()
+    """Select a random city from a predefined list of city names."""
+    cities = [
+        "Valencia", "Madrid", "Barcelona", "Sevilla", "Zaragoza", 
+        "Málaga", "Murcia", "Palma de Mallorca", 
+        "Las Palmas de Gran Canaria", "Bilbao", "Granada", 
+        "Santander", "Alicante", "Valladolid", "Oviedo"
+    ]
     return random.choice(cities)
   
 def ping_with_response_time(ipv4, timeout=1):
     """Ping an IPv4 address and return the response time in ms."""
+
+def ping_with_contact_time(ipv4, timeout=1):
+    """Ping an IPv4 address and return the last contact time as a UNIX timestamp"""
+
     try:
         output = subprocess.check_output(
             "ping -c 1 -W {} {}".format(timeout, ipv4),
@@ -42,7 +45,7 @@ def ping_with_response_time(ipv4, timeout=1):
         )
         match = re.search(r'time=(\d+\.\d+) ms', output)
         if match:
-            return float(match.group(1))
+            return int(time.time())  # Return the current time as a UNIX timestamp
         return None
     except subprocess.CalledProcessError:
         return None  # Ping failed or timeout
@@ -78,13 +81,13 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
 
     # Default list of ips to check - raspberry pi IPs
     if ips_to_check is None:
-        ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
-        # ips_to_check = ["localhost"] # <- for local testing
+        # ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+        ips_to_check = ["localhost"] # <- for local testing
 
     for ip in ips_to_check:
-        response_time = ping_with_response_time(ip)
-        print(f"Response time for {ip}: {response_time}")
-        if response_time is not None:
+        contact_time = ping_with_contact_time(ip)
+        print(f"Time of last contact for {ip}: {contact_time}")
+        if contact_time is not None:
             for queried_port in range(min_port, max_port + 1):
                 if queried_port == port:
                     print(f"Skipping port {queried_port} as that is our own port.")
@@ -96,7 +99,7 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
                     results.append({
                         "IPv4": ip,
                         "Port": queried_port,
-                        "Response Time": response_time,
+                        "Contact Time": contact_time,
                         "Device Function": function,
                     })
     
@@ -123,7 +126,7 @@ def get_neighbouring_satellites():
 
     with open(file_name, "w", newline="") as csvfile:
         print(f"Writing to {file_name}")
-        fieldnames = ["IPv4", "Port", "Response Time", "Device Function"]
+        fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(starter_satellite_list)
