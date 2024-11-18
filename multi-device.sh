@@ -22,14 +22,14 @@ fi
 
 # Validate the number of instances argument
 if [ -z "$1" ] || [ "$1" -lt 1 ] || [ "$1" -gt 100 ]; then
-    echo "Usage: $0 <number between 1 and 100> <DEVICE_FUNCTION> [START_PORT] <RESET_RESOURCES>"
+    echo "Usage: $0 <number between 1 and 100> <DEVICE_FUNCTION> <RESET_RESOURCES> [START_PORT]"
     exit 1
 fi
 
 # Check if DEVICE_FUNCTION is provided
 DEVICE_FUNCTION=$2
 if [ -z "$DEVICE_FUNCTION" ]; then
-    echo "Usage: $0 <number between 1 and 100> <DEVICE_FUNCTION> [START_PORT] <RESET_RESOURCES>"
+    echo "Usage: $0 <number between 1 and 100> <DEVICE_FUNCTION> <RESET_RESOURCES> [START_PORT]"
     exit 1
 fi
 

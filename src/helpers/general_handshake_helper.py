@@ -43,8 +43,6 @@ def write_received_handshake(handshake_data, bobb_header):
     # Append the data to the JSON file if it's a new neighbor (set the last contact time to the current time for this neighbour)
     if write_to_json(source_ip, device_function, public_key, source_port, timestamp):
         print(f"Neighbour {source_ip}:{source_port} added")
-    else:
-        print(f"{source_ip}:{source_port} was already a neighbour, not adding again")
 
 
 def write_to_json(source_ip, device_function, public_key, port, timestamp):
@@ -74,7 +72,7 @@ def write_to_json(source_ip, device_function, public_key, port, timestamp):
 
     # Flexible validation for required fields
     if source_ip is None or port is None:
-        print("Error: Missing required fields.")
+        print("Error: Missing required fields in neighbour.")
         return False
 
     # Create a new neighbor entry

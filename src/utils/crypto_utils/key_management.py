@@ -3,12 +3,17 @@ import os
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import x25519
 
-def generate_keys(satellite_name: str, key_dir="keys"):
+def generate_keys(name: str, key_dir="keys"):
     """Generates an X25519 key pair and saves them as PEM files based on satellite name."""
     os.makedirs(key_dir, exist_ok=True)  # Ensure directory exists
     
-    private_key_path = os.path.join(key_dir, f"{satellite_name}_private_key.pem")
-    public_key_path = os.path.join(key_dir, f"{satellite_name}_public_key.pem")
+    private_key_path = os.path.join(key_dir, f"{name}_private_key.pem")
+    public_key_path = os.path.join(key_dir, f"{name}_public_key.pem")
+
+    # Check if either key file already exists
+    if os.path.exists(private_key_path) and os.path.exists(public_key_path):
+        print(f"Keys for '{name}' already exist in '{key_dir}' directory")
+        return private_key_path, public_key_path
 
     # Generate X25519 private key
     private_key = x25519.X25519PrivateKey.generate()
@@ -33,7 +38,7 @@ def generate_keys(satellite_name: str, key_dir="keys"):
             )
         )
     
-    print(f"Keys for '{satellite_name}' generated and saved to '{key_dir}' directory as '{satellite_name}_private_key.pem' and '{satellite_name}_public_key.pem'")
+    print(f"Keys for '{name}' generated and saved to '{key_dir}' directory as '{name}_private_key.pem' and '{name}_public_key.pem'")
 
 def read_private_key(private_key_filename: str) -> x25519.X25519PrivateKey:
     """Reads the private key from the specified file."""
