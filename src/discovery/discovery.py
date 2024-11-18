@@ -7,14 +7,16 @@ import os
 import random
 import ssl
 import time
-import urllib3
 import requests  # For HTTPS requests with SSL context
 from requests.adapters import HTTPAdapter
 from urllib3.poolmanager import PoolManager
 from src.config.config import valid_functions
+
+
+import urllib3
+
 from src.helpers.send_handshake_helper import send_handshakes
 
-# Disable warnings about insecure SSL requests
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # To block the SCSS proxying, to connect directly to the other Pis
