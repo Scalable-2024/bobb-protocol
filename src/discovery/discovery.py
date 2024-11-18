@@ -66,9 +66,13 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
 
     print(ips_to_check)
 
-    # Default list of ips to check - raspberry pi IPs
-    if ips_to_check is None:
-        # ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+    ip = os.getenv("IP")
+    # If on a private IP address, assume raspberry pis
+    if ip.split('.')[0] == "10":
+        # Default list of ips to check - raspberry pi IPs
+        if ips_to_check is None:
+            ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+    else:
         ips_to_check = ["localhost"] # <- for local testing
 
     for ip in ips_to_check:
@@ -118,16 +122,3 @@ def get_neighbouring_satellites():
         writer.writeheader()
         writer.writerows(starter_satellite_list)
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Ping sweep for a given network and save results to CSV.")
-    parser.add_argument("--ping_ip", default="10.35.70",
-                        help="Base IP address for ping (e.g., 192.168.1)")
-    parser.add_argument("--port", default=33001,
-                        help="Port which will serve satellite identification")
-    parser.add_argument("--output_csv", default="results.csv",
-                        help="Output CSV file name (e.g., results.csv)")
-    parser.add_argument('--endpoint', default="id",
-                        help="The endpoint which the satellite serves its identification on - eg /id")
-    args = parser.parse_args()
-    main(args.ping_ip, args.port, args.output_csv, args.endpoint)

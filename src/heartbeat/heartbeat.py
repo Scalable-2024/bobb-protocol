@@ -100,8 +100,8 @@ def send_heartbeat_to_neighbours():
                 "function": neighbour["function"],
                 "last_contact": neighbour["last_contact"],
             }
-            # neighbour_urls.add(f'https://{neighbour["ip"]}:{neighbour["port"]}/heartbeat')
-            neighbour_urls.add(f'https://192.168.0.235:{neighbour["port"]}/heartbeat')
+            neighbour_urls.add(f'https://{neighbour["ip"]}:{neighbour["port"]}/heartbeat')
+            # neighbour_urls.add(f'https://192.168.0.235:{neighbour["port"]}/heartbeat')
     
     print(f"Neighbours : {neighbours}")
     print(f'Neighbours urls: {neighbour_urls}')

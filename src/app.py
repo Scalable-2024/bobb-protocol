@@ -43,7 +43,7 @@ def schedule_activities_once_started_up():
     time.sleep(3)
 
     # Schedule satellite discovery every 5 minutes
-    scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(minutes=5), id='device_discovery', replace_existing=True)
+    scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(minutes=1), id='device_discovery', replace_existing=True)
 
     # Schedule handshaking every 30s
     scheduler.add_job(func=send_handshakes, trigger=IntervalTrigger(seconds=30), id='sending_handshakes', replace_existing=True)
