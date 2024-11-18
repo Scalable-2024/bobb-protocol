@@ -281,15 +281,14 @@ def manage_neighbours():
             # Extract IP and port for the new neighbour
             n_ip, n_port = new_neighbour["ip"], new_neighbour["port"]
             # Send handshake to the new neighbour
+            
             send_handshake((n_ip, n_port))
 
-            # Append the new neighbour to the neighbours list
-            neighbours.append(new_neighbour)
-
-            # Write updated neighbours and to_be_discovered lists to their respective files
-            with open(neighbours_file, 'w') as f:
-                json.dump(neighbours, f, indent=4)
-            print(f"[DEBUG] Updated neighbours list: {neighbours}")
+            # Write updated to_be_discovered lists to their respective files
+          
+            # with open(neighbours_file, 'w') as f:
+            #     json.dump(neighbours, f, indent=4)
+            # print(f"[DEBUG] Updated neighbours list: {neighbours}")
             with open(to_be_discovered_csv, 'w', newline="") as f:
                 writer = csv.DictWriter(f, fieldnames=new_neighbour.keys())
                 writer.writeheader()
