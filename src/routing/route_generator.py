@@ -4,7 +4,6 @@ import random
 from dataclasses import dataclass
 from typing import Dict, List, Set, Optional, Tuple
 from collections import defaultdict
-import matplotlib.pyplot as plt
 import networkx as nx
 from enum import Enum, auto
 
@@ -257,45 +256,6 @@ class RouteGenerator:
             for hop in route.path:
                 load[hop] += 1
         return load
-
-    def visualize_routes(self, routes: Dict[str, Dict[str, List[Route]]], output_dir: str):
-        """Visualize all routes in the network"""
-        os.makedirs(output_dir, exist_ok=True)
-
-        # Create a separate visualization for each route type
-        for route_type in RouteType:
-            plt.figure(figsize=(12, 8))
-            pos = nx.spring_layout(self.network_graph)
-
-            # Draw base network
-            nx.draw_networkx_nodes(
-                self.network_graph, pos, node_color='lightgray')
-            nx.draw_networkx_edges(self.network_graph, pos, alpha=0.2)
-            nx.draw_networkx_labels(self.network_graph, pos)
-
-            # Draw routes of this type
-            route_edges = set()
-            for source in routes:
-                for dest in routes[source]:
-                    for route in routes[source][dest]:
-                        if route.type == route_type:
-                            path = [source] + route.path
-                            for i in range(len(path)-1):
-                                route_edges.add((path[i], path[i+1]))
-
-            # Draw route edges
-            nx.draw_networkx_edges(
-                self.network_graph,
-                pos,
-                edgelist=list(route_edges),
-                edge_color='r',
-                width=2
-            )
-
-            plt.title(f"{route_type.name} Routes")
-            plt.savefig(os.path.join(output_dir, f"routes_{
-                        route_type.name.lower()}.png"))
-            plt.close()
 
 
 def generate_all_routes(constellation_file: str) -> Dict[str, Dict[str, List[Route]]]:
