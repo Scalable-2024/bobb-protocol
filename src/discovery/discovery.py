@@ -91,13 +91,14 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
     results = []
 
     ip = os.getenv("IP")
-    # If on a private IP address, assume Raspberry Pis
-    if ip.split('.')[0] == "10":
-        # Default list of IPs to check - Raspberry Pi IPs
-        if ips_to_check is None:
-            ips_to_check = [f"10.35.70.{ext}" for ext in range(1, 50)]
-    else:
-        ips_to_check = ["localhost"]  # For local testing
+    # If on a private IP address, assume raspberry pis
+    # if ip.split('.')[0] == "10":
+    #     # Default list of ips to check - raspberry pi IPs
+    #     if ips_to_check is None:
+    #         ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+    # else:
+    ips_to_check = ["localhost"]  # <- for local testing
+
 
     for ip in ips_to_check:
         contact_time = ping_with_contact_time(ip)

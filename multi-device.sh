@@ -39,11 +39,29 @@ if [ -z "$START_PORT" ]; then
     START_PORT=33001
 fi
 
+
+# Check if Rust is installed
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    . $HOME/.cargo/env
+    if ! rustc --version &> /dev/null; then
+        echo "Rust is not installed. Installing Rust..."
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --profile default -y &> /dev/null;
+        . $HOME/.cargo/env
+        # Verify the installation
+        if rustc --version &> /dev/null; then
+            echo "Rust has been installed successfully."
+        else
+            echo "Rust installation failed. Exiting."
+            exit 1
+        fi
+    fi
+fi
+
 # Run the original script the specified number of times with ports incrementing from START_PORT
 i=0
 while [ "$i" -lt "$1" ]; do
     port=$((START_PORT + i))
-    ./run.sh "$port" "$DEVICE_FUNCTION" &
+    bash run.sh "$port" "$DEVICE_FUNCTION" &
     i=$((i + 1))
 done
 
