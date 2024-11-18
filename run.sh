@@ -1,14 +1,30 @@
 #!/bin/bash
 
+# Check if Rust is installed
+if ! command -v rustc &> /dev/null; then
+    echo "Rust is not installed. Installing Rust..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --profile default -y
+    source $HOME/.cargo/env
+
+    # Verify the installation
+    if rustc --version &> /dev/null; then
+        echo "Rust has been installed successfully."
+    else
+        echo "Rust installation failed. Exiting."
+        exit 1
+    fi
+fi
+
+source $HOME/.cargo/env
+
+# Create and activate a Python virtual environment
 python3 -m venv bobb_venv
 source ./bobb_venv/bin/activate
 
 echo "Installing Python dependencies"
 pip3 install -r requirements.txt > /dev/null 2>&1
 
-# openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes
-
-# Set default port
+# Default to port 33001 if not provided
 PORT=${1:-33001}
 export PORT
 echo $PORT
