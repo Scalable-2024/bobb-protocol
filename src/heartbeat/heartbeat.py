@@ -77,7 +77,6 @@ def heartbeat():
     with open(constellation_file, 'w') as f:
         json.dump(our_constellation, f, indent=4)
         
-    print("Constellation data updated and saved")
     return jsonify({"message": "Constellation data processed"}), 200
 
 
@@ -106,8 +105,8 @@ def send_heartbeat_to_neighbours():
             neighbour_urls.add(f'https://{neighbour["ip"]}:{neighbour["port"]}/heartbeat')
             # neighbour_urls.add(f'https://192.168.0.235:{neighbour["port"]}/heartbeat')
     
-    print(f"Neighbours : {neighbours}")
-    print(f'Neighbours urls: {neighbour_urls}')
+    # print(f"Neighbours : {neighbours}")
+    # print(f'Neighbours urls: {neighbour_urls}')
     
     # Define directory and file paths
     constellation_dir = 'resources/satellite_constellation_set'
@@ -162,8 +161,6 @@ def send_heartbeat_to_neighbours():
             headers = {
                 X_BOBB_HEADER: header,
             }
-            
-            print(f"Sending heartbeat to {url} with headers: {headers}")
 
             # Send handshake
             response = requests.post(

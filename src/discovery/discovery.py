@@ -67,8 +67,6 @@ def check_device_type(ipv4, port, endpoint, verbose):
 def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5, port=None):
     results = []
 
-    print(ips_to_check)
-
     ip = os.getenv("IP")
     # If on a private IP address, assume raspberry pis
     if ip.split('.')[0] == "10":
@@ -80,16 +78,16 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
 
     for ip in ips_to_check:
         contact_time = ping_with_contact_time(ip)
-        print(f"Time of last contact for {ip}: {contact_time}")
+        # print(f"Time of last contact for {ip}: {contact_time}")
         if contact_time is not None:
             for queried_port in range(min_port, max_port + 1):
                 if queried_port == port:
-                    print(f"Skipping port {queried_port} as that is our own port.")
+                    # print(f"Skipping port {queried_port} as that is our own port.")
                     continue
                 function = check_device_type(ip, queried_port, endpoint, verbose=False)
                 # The only case we care about is when the IP and port are valid
                 if function is not None:
-                    print(f"Found {ip}:{queried_port} with function {function}")
+                    # print(f"Found {ip}:{queried_port} with function {function}")
                     results.append({
                         "IPv4": ip,
                         "Port": queried_port,
@@ -119,7 +117,7 @@ def get_neighbouring_satellites():
     os.makedirs(directory_path, exist_ok=True)
 
     with open(file_name, "w", newline="") as csvfile:
-        print(f"Writing to {file_name}")
+        # print(f"Writing to {file_name}")
         fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()

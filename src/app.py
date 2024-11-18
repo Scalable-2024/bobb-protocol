@@ -33,7 +33,6 @@ atexit.register(lambda: scheduler.shutdown())
 
 def initial_satellite_search():
     time.sleep(2)
-    print("Initial satellite search")
     get_neighbouring_satellites()
 
 def schedule_activities_once_started_up():
