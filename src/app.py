@@ -12,8 +12,9 @@ from src.utils.headers.necessary_headers import BobbHeaders
 from src.utils.headers.optional_header import BobbOptionalHeaders
 from src.helpers.response_helper import create_response
 from src.config.constants import X_BOBB_HEADER, X_BOBB_OPTIONAL_HEADER, ERROR_INVALID_BOBB_HEADER, ERROR_INVALID_OPTIONAL_HEADER
-from src.discovery.discovery import get_neighbouring_satellites
+from src.discovery.discovery import get_neighbouring_satellites, get_random_city
 from src.helpers.send_handshake_helper import send_handshakes
+from src.helpers.send_location_helper import send_location
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import atexit
@@ -32,6 +33,26 @@ app.register_blueprint(main_router)
 scheduler = BackgroundScheduler()
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
+
+def update_satellite_location():
+    """Send the updated location of the satellite to the basestation."""
+    city = get_random_city()
+    location_data = {
+        "name": name,
+        "location": city["location"],
+        "ip": os.getenv("IP"),
+        "function": device_function
+    }
+    send_location(location_data)
+    
+# Schedule satellite location update every 5 minutes
+scheduler.add_job(func=update_satellite_location, trigger=IntervalTrigger(minutes=5), id='update_location', replace_existing=True)
+
+# Schedule satellite discovery every 5 minutes
+scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(minutes=5), id='device_discovery', replace_existing=True)
+
+# Schedule handshaking every 30s
+scheduler.add_job(func=send_handshakes, trigger=IntervalTrigger(seconds=30), id='sending_handshakes', replace_existing=True)
 
 def initial_satellite_search():
     time.sleep(2)
