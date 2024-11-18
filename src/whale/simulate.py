@@ -37,10 +37,35 @@ class WhaleModel:
         self.ip = ip
         self.port = port
 
+    def generate_whale_data(self, time_since_surfaced):
+        whale_data_points = []
+        
+        # create sample data points for every 60 seconds since the time_since_surfaced
+        for i in range(time_since_surfaced // 60):
+            whale_data_point = {
+                "whale_id": self.whale_id,
+                "timestamp": int(time.time()),
+                "latitude": random.uniform(-90, 90),
+                "longitude": random.uniform(-180, 180),
+                "speed": random.uniform(0, 10),  # speed in m/s
+                "depth": random.randint(0, 3000),  # depth in meters
+                "water_temperature": random.uniform(-2, 30),  # in degrees Celsius
+                "heart_rate": random.randint(30, 60),  # in beats per minute
+                "energy_level": random.uniform(0, 100),  # arbitrary units
+                "number_of_breaths": random.randint(1, 5),
+                "heading": random.uniform(0, 360),  # degrees
+            }
+            whale_data_points.append(whale_data_point)
+        
+        return whale_data_points
+
     # Method to send data to the satellite when the whale resurfaces
     def send_data(self, time_since_surfaced):
+        # Random time the whale will spend at the surface
         surface_time = random.randint(self.min_surface_time, self.max_surface_time)
-        sample_data = f"whale {self.whale_id} says: Whale Data wHaLe DaTa whale data WHALE DATA" * time_since_surfaced
+        
+        # Whale data collected since last surfaced
+        sample_data = self.generate_whale_data(self, time_since_surfaced)
 
         # Prepare header
         header = necessary_headers.BobbHeaders(
