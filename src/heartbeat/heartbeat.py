@@ -7,6 +7,7 @@ import threading
 import time
 
 from src.config.constants import MAX_TIMEOUT, X_BOBB_HEADER
+from src.routing.route_generator import create_routing_tables
 from src.utils.headers.necessary_headers import BobbHeaders
 
 app = Flask(__name__)
@@ -92,6 +93,11 @@ def heartbeat():
     
     # Save the updated constellation data
     safe_save_json(constellation_file, our_constellation)
+
+    updated = create_routing_tables()
+
+
+
         
     return jsonify({"message": "Constellation data processed"}), 200
 
