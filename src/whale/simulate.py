@@ -41,7 +41,6 @@ class WhaleModel:
     def send_data(self, time_since_surfaced):
         surface_time = random.randint(self.min_surface_time, self.max_surface_time)
         sample_data = f"whale {self.whale_id} says: Whale Data wHaLe DaTa whale data WHALE DATA" * time_since_surfaced
-        sample_data = sample_data.encode()
 
         # Prepare header
         header = necessary_headers.BobbHeaders(
@@ -61,7 +60,13 @@ class WhaleModel:
         # Send acknowledgment request to satellite
         try:
             # TODO: enable verification
-            response = requests.get(f"https://{self.satellite_ip}:{self.satellite_port}/", headers=headers, verify=False, timeout=surface_time, proxies=proxies)
+            response = requests.post(f"https://{self.satellite_ip}:{self.satellite_port}/route", verify=False, timeout=surface_time, proxies=proxies, json= {
+                "source": f"{self.ip}:{self.port}",
+                "destination": f"{self.destination_ip}:{self.destination_port}",
+                "message": sample_data,
+                "priority": "high"
+            })
+            #response = requests.get(f"https://{self.satellite_ip}:{self.satellite_port}/route", headers=headers, verify=False, timeout=surface_time, proxies=proxies)
             print(f"Whale {self.whale_id} received response code {response.status_code} and content: {response.text}")
         except Exception as e:
             print(f"Failed to send data for whale {self.whale_id}: {e}")
