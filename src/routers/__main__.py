@@ -1,7 +1,7 @@
 import base64
 import os
 
-from flask import Blueprint, app, jsonify
+from flask import Blueprint, app, jsonify, request
 
 from src.config.constants import SATELLITE_FUNCTION_DISASTER_IMAGING, BASESTATION
 from src.controllers.create_headers import create_header
@@ -10,6 +10,7 @@ from src.controllers.identify import return_identity
 from src.controllers.handshake import handshake
 from src.heartbeat.heartbeat import heartbeat
 from src.middleware.header_middleware import check_headers
+from src.discovery.discovery import get_random_city
 
 router = Blueprint('main', __name__)
 
@@ -48,6 +49,23 @@ def receive_heartbeat():
     # Call controller function if headers are valid
     return heartbeat()
 
+    @router.route('/send-location', methods=["POST"])
+def send_location():
+    """
+    Randomly select and send location to the base station.
+    """
+    middleware_response = check_headers()
+    if middleware_response is not True:
+        return middleware_response  # Return error if headers are invalid
+
+    try:
+        location = get_random_city()
+        base_station_url = "http://basestation.example.com/update-location"
+        print(f"Sending location '{location}' to Base Station at {base_station_url}")
+        return jsonify({"status": "success", "location_sent": location}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+        
 # Base station routes
 
 # @router.route('/v1/satellites', methods=['GET'])
