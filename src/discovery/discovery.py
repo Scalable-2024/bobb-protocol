@@ -3,26 +3,46 @@ import logging
 import subprocess
 import re
 import csv
-import requests
 import os
 import random
+<<<<<<< Updated upstream
 import re
 import time
 from src.config.config import valid_functions
 
 # TODO allow self signed certificates
+=======
+import ssl
+>>>>>>> Stashed changes
 import urllib3
-urllib3.disable_warnings()
+from bobb.src.config.config import valid_functions
+
+
+# Disable warnings about insecure SSL requests
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# Create an SSL context to allow self-signed certificates
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
+
+# Create a PoolManager with the custom SSL context
+http = urllib3.PoolManager(ssl_context=ssl_context)
 
 # To block the SCSS proxying, to connect directly to the other pis
 proxies = {
-  'http': '',
-  'https': '',
+    'http': '',
+    'https': '',
 }
 
+<<<<<<< Updated upstream
 
 def ping_with_contact_time(ipv4, timeout=1):
     """Ping an IPv4 address and return the last contact time as a UNIX timestamp"""
+=======
+def ping_with_response_time(ipv4, timeout=1):
+    """Ping an IPv4 address and return the response time in ms."""
+>>>>>>> Stashed changes
     try:
         output = subprocess.check_output(
             "ping -c 1 -W {} {}".format(timeout, ipv4),
@@ -37,30 +57,30 @@ def ping_with_contact_time(ipv4, timeout=1):
     except subprocess.CalledProcessError:
         return None  # Ping failed or timeout
 
-
 def check_device_type(ipv4, port, endpoint, verbose):
-    """Make an HTTP request using curl and return the response message if status code is 200."""
+    """Make an HTTPS request using a custom SSL context for self-signed certificates."""
     try:
-        # Log to indicate progress
         addr = f"https://{ipv4}:{port}/{endpoint}"
         if verbose:
-            print(f"Attempting HTTP request to {addr}...")
-        # TODO: Allow self signed certificates
-        resp = requests.get(addr, verify=False, timeout=3, proxies=proxies)
+            print(f"Attempting HTTPS request to {addr}...")
+
+        # Use urllib3's PoolManager to make the HTTPS request
+        resp = http.request("GET", addr, timeout=3.0)
+
         # Check the HTTP status code and response
-        if resp.status_code == 200:
+        if resp.status == 200:
             if verbose:
                 print(f"HTTP 200 OK from {addr}")
-            function = resp.json()['data']
+            function = resp.data.decode('utf-8')
             if function in valid_functions:
                 return function
-            
+
         return None
     except Exception as e:
         if verbose:
             print(f"Got error: {e}")
         return None
-    
+
 def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5, port=None):
     results = []
 
@@ -93,7 +113,7 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
                         "Contact Time": contact_time,
                         "Device Function": function,
                     })
-    
+
     # Randomly select x satellites from the results
     if len(results) > x:
         selected_results = random.sample(results, x)
