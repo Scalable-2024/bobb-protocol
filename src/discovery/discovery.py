@@ -106,6 +106,7 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
                 function = check_device_type(ip, queried_port, endpoint, verbose=False)
                 # The only case we care about is when the IP and port are valid
                 if function is not None:
+                    # print(f"Found {ip}:{queried_port} with function {function}")
                     results.append({
                         "IPv4": ip,
                         "Port": queried_port,
@@ -136,6 +137,7 @@ def get_neighbouring_satellites():
     os.makedirs(directory_path, exist_ok=True)
 
     with open(file_name, "w", newline="") as csvfile:
+        # print(f"Writing to {file_name}")
         fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
