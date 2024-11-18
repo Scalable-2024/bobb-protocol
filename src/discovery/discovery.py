@@ -7,6 +7,9 @@ import os
 import random
 import ssl
 import urllib3
+import requests  # For HTTPS requests with SSL context
+from requests.adapters import HTTPAdapter
+from urllib3.poolmanager import PoolManager
 from bobb.src.config.config import valid_functions
 
 
@@ -18,15 +21,25 @@ ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
-# Create a PoolManager with the custom SSL context
-http = urllib3.PoolManager(ssl_context=ssl_context)
+# Custom HTTPSAdapter for requests to use the above SSL context
+class SSLAdapter(HTTPAdapter):
+    def __init__(self, ssl_context=None, **kwargs):
+        self.ssl_context = ssl_context
+        super().__init__(**kwargs)
+
+    def init_poolmanager(self, *args, **kwargs):
+        kwargs['ssl_context'] = self.ssl_context
+        return super().init_poolmanager(*args, **kwargs)
+
+# Create a session to use the custom SSL context
+session = requests.Session()
+session.mount("https://", SSLAdapter(ssl_context))
 
 # To block the SCSS proxying, to connect directly to the other pis
 proxies = {
     'http': '',
     'https': '',
 }
-
 
 def ping_with_contact_time(ipv4, timeout=1):
     """Ping an IPv4 address and return the last contact time as a UNIX timestamp"""
@@ -51,14 +64,14 @@ def check_device_type(ipv4, port, endpoint, verbose):
         if verbose:
             print(f"Attempting HTTPS request to {addr}...")
 
-        # Use urllib3's PoolManager to make the HTTPS request
-        resp = http.request("GET", addr, timeout=3.0)
+        # Use requests with the custom session for the HTTPS request
+        resp = session.get(addr, timeout=3.0, proxies=proxies)
 
         # Check the HTTP status code and response
-        if resp.status == 200:
+        if resp.status_code == 200:
             if verbose:
                 print(f"HTTP 200 OK from {addr}")
-            function = resp.data.decode('utf-8')
+            function = resp.text.strip()
             if function in valid_functions:
                 return function
 
