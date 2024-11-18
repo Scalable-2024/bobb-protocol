@@ -8,5 +8,8 @@ __pycache__/
 bobb_venv/
 resources/satellite_listings/
 resources/satellite_neighbours/
+resources/satellite_constellation_set/
+resources/satellite_blocklists/
+resources/to_be_discovered/
 config/
 keys/
