@@ -12,6 +12,9 @@ from src.config.config import valid_functions
 
 # TODO allow self signed certificates
 import urllib3
+
+from src.helpers.send_handshake_helper import send_handshakes
+
 urllib3.disable_warnings()
 
 # To block the SCSS proxying, to connect directly to the other pis
@@ -122,3 +125,4 @@ def get_neighbouring_satellites():
         writer.writeheader()
         writer.writerows(starter_satellite_list)
 
+    send_handshakes()
