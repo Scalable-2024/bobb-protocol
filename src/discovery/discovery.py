@@ -5,15 +5,7 @@ import re
 import csv
 import os
 import random
-<<<<<<< Updated upstream
-import re
-import time
-from src.config.config import valid_functions
-
-# TODO allow self signed certificates
-=======
 import ssl
->>>>>>> Stashed changes
 import urllib3
 from bobb.src.config.config import valid_functions
 
@@ -35,14 +27,9 @@ proxies = {
     'https': '',
 }
 
-<<<<<<< Updated upstream
 
 def ping_with_contact_time(ipv4, timeout=1):
     """Ping an IPv4 address and return the last contact time as a UNIX timestamp"""
-=======
-def ping_with_response_time(ipv4, timeout=1):
-    """Ping an IPv4 address and return the response time in ms."""
->>>>>>> Stashed changes
     try:
         output = subprocess.check_output(
             "ping -c 1 -W {} {}".format(timeout, ipv4),
