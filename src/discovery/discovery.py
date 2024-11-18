@@ -7,6 +7,7 @@ import requests
 import os
 import random
 import re
+import time
 from src.config.config import valid_functions
 
 # TODO allow self signed certificates
@@ -20,8 +21,8 @@ proxies = {
 }
 
 
-def ping_with_response_time(ipv4, timeout=1):
-    """Ping an IPv4 address and return the response time in ms."""
+def ping_with_contact_time(ipv4, timeout=1):
+    """Ping an IPv4 address and return the last contact time as a UNIX timestamp"""
     try:
         output = subprocess.check_output(
             "ping -c 1 -W {} {}".format(timeout, ipv4),
@@ -31,7 +32,7 @@ def ping_with_response_time(ipv4, timeout=1):
         )
         match = re.search(r'time=(\d+\.\d+) ms', output)
         if match:
-            return float(match.group(1))
+            return int(time.time())  # Return the current time as a UNIX timestamp
         return None
     except subprocess.CalledProcessError:
         return None  # Ping failed or timeout
@@ -60,20 +61,20 @@ def check_device_type(ipv4, port, endpoint, verbose):
             print(f"Got error: {e}")
         return None
     
-def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5, port=None):
+def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33030, endpoint="id", x=10, port=None): #33100 to
     results = []
 
     print(ips_to_check)
 
     # Default list of ips to check - raspberry pi IPs
     if ips_to_check is None:
-        ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
-        # ips_to_check = ["localhost"] # <- for local testing
+        # ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+        ips_to_check = ["localhost"] # <- for local testing
 
     for ip in ips_to_check:
-        response_time = ping_with_response_time(ip)
-        print(f"Response time for {ip}: {response_time}")
-        if response_time is not None:
+        contact_time = ping_with_contact_time(ip)
+        print(f"Time of last contact for {ip}: {contact_time}")
+        if contact_time is not None:
             for queried_port in range(min_port, max_port + 1):
                 if queried_port == port:
                     print(f"Skipping port {queried_port} as that is our own port.")
@@ -85,7 +86,7 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
                     results.append({
                         "IPv4": ip,
                         "Port": queried_port,
-                        "Response Time": response_time,
+                        "Contact Time": contact_time,
                         "Device Function": function,
                     })
     
@@ -102,20 +103,78 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
 # This is because we need the ip addresses to simulate communication.
 # It should return the intended neighbour satellites - for now, just the ones with the lowest latency.
 def get_neighbouring_satellites():
+    # Get the port number from the environment variable
     port = os.getenv("PORT")
-    starter_satellite_list = find_x_satellites(x=5, port=int(port))
+    if not port:
+        raise ValueError("PORT environment variable is not set.")
+    print(f"[DEBUG] PORT environment variable is set to: {port}")
 
+    # Find a list of 20 potential satellites using the specified port
+    print("[DEBUG] Starting satellite discovery...")
+    starter_satellite_list = find_x_satellites(x=10, port=int(port))
+    print(f"[DEBUG] Discovered {len(starter_satellite_list)} satellites.")
+
+    # Define the base directory for resources
     base_dir = os.getcwd()
-    directory_path = os.path.join(base_dir, "resources", "satellite_listings")
-    file_name = os.path.join(directory_path, f"full_satellite_listing_{port}.csv")
-    os.makedirs(directory_path, exist_ok=True)
+    print(f"[DEBUG] Base directory: {base_dir}")
 
-    with open(file_name, "w", newline="") as csvfile:
-        print(f"Writing to {file_name}")
-        fieldnames = ["IPv4", "Port", "Response Time", "Device Function"]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(starter_satellite_list)
+    # Define paths for satellite listings and to-be-discovered directories
+    directory_path = os.path.join(base_dir, "resources", "satellite_listings")
+    discovery_dir = os.path.join(base_dir, "resources", "to_be_discovered")
+    print(f"[DEBUG] Satellite listings directory path: {directory_path}")
+    print(f"[DEBUG] To-be-discovered directory path: {discovery_dir}")
+
+    # Define file paths for the full satellite listing and to-be-discovered files
+    file_name = os.path.join(directory_path, f"full_satellite_listing_{port}.csv")
+    discovery_file = os.path.join(discovery_dir, f"to_be_discovered_{port}.csv")
+    print(f"[DEBUG] Full satellite listing file path: {file_name}")
+    print(f"[DEBUG] To-be-discovered file path: {discovery_file}")
+
+    # Ensure the directories exist
+    print("[DEBUG] Ensuring directories exist...")
+    os.makedirs(directory_path, exist_ok=True)
+    os.makedirs(discovery_dir, exist_ok=True)
+
+    # Calculate the number of satellites to move to the to-be-discovered list (5% of the total)
+    total_satellites = len(starter_satellite_list)
+    discovery_count = max(1, int(total_satellites * 0.05))  # Ensure at least 1 satellite is selected
+    print(f"[DEBUG] Total satellites: {total_satellites}, Discovery count (5%): {discovery_count}")
+
+    # Split the starter list into to-be-discovered and remaining satellites
+    to_be_discovered = starter_satellite_list[:discovery_count]  # First 5% for discovery
+    remaining_satellites = starter_satellite_list[discovery_count:]  # Remaining 95%
+    print(f"[DEBUG] To-be-discovered satellites: {len(to_be_discovered)}")
+    print(f"[DEBUG] Remaining satellites: {len(remaining_satellites)}")
+
+    # Write the remaining satellites to the full satellite listing file
+    try:
+        with open(file_name, "w", newline="") as csvfile:
+            print(f"[DEBUG] Writing full satellite listing to {file_name}")
+            fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(remaining_satellites)  # Write the remaining satellites to the file
+    except Exception as e:
+        print(f"[ERROR] Failed to write full satellite listing: {e}")
+
+    # Write the to-be-discovered satellites to the discovery file
+    try:
+        with open(discovery_file, "w", newline="") as csvfile:
+            print(f"[DEBUG] Writing to_be_discovered list to {discovery_file}")
+            fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(to_be_discovered)  # Write the to-be-discovered satellites to the file
+    except Exception as e:
+        print(f"[ERROR] Failed to write to_be_discovered list: {e}")
+
+
+    # with open(file_name, "w", newline="") as csvfile:
+    #     print(f"Writing to {file_name}")
+    #     fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
+    #     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    #     writer.writeheader()
+    #     writer.writerows(starter_satellite_list)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -130,3 +189,4 @@ if __name__ == "__main__":
                         help="The endpoint which the satellite serves its identification on - eg /id")
     args = parser.parse_args()
     main(args.ping_ip, args.port, args.output_csv, args.endpoint)
+
