@@ -33,23 +33,29 @@ scheduler = BackgroundScheduler()
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
-# Schedule satellite discovery every 5 minutes
-scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(minutes=5), id='device_discovery', replace_existing=True)
-
-# Schedule handshaking every 30s
-scheduler.add_job(func=send_handshakes, trigger=IntervalTrigger(seconds=30), id='sending_handshakes', replace_existing=True)
-
-# Schedule heartbeat every 30s
-time.sleep(3) # Sleep for 3 seconds to allow the satellite to discover its neighbours
-scheduler.add_job(func=send_heartbeat_to_neighbours, trigger=IntervalTrigger(seconds=30), id='sending_heartbeats', replace_existing=True)
-
 def initial_satellite_search():
     time.sleep(2)
     print("Initial satellite search")
     get_neighbouring_satellites()
 
+def schedule_activities_once_started_up():
+    # Wait 4s to allow initial startup and discovery
+    time.sleep(3)
+
+    # Schedule satellite discovery every 5 minutes
+    scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(minutes=5), id='device_discovery', replace_existing=True)
+
+    # Schedule handshaking every 30s
+    scheduler.add_job(func=send_handshakes, trigger=IntervalTrigger(seconds=30), id='sending_handshakes', replace_existing=True)
+
+    # Schedule heartbeat every 30s
+    scheduler.add_job(func=send_heartbeat_to_neighbours, trigger=IntervalTrigger(seconds=30), id='sending_heartbeats', replace_existing=True)
+
 thread = threading.Thread(target=initial_satellite_search)
 thread.start()
+
+schedule_thread = threading.Thread(target=schedule_activities_once_started_up)
+schedule_thread.start()
 
 @app.before_request
 def add_custom_headers_to_request():
