@@ -1,21 +1,5 @@
 #!/bin/bash
 
-# Check if Rust is installed
-if ! rustc --version &> /dev/null; then
-    echo "Rust is not installed. Installing Rust..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --profile default -y &> /dev/null;
-
-    # Verify the installation
-    if rustc --version &> /dev/null; then
-        echo "Rust has been installed successfully."
-    else
-        echo "Rust installation failed. Exiting."
-        exit 1
-    fi
-fi
-
-source $HOME/.cargo/env
-
 # Create and activate a Python virtual environment
 python3 -m venv bobb_venv
 source ./bobb_venv/bin/activate
