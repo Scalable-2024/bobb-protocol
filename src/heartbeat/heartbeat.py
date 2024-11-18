@@ -279,7 +279,7 @@ def manage_neighbours():
             print(f"[DEBUG] Adding new neighbour from to_be_discovered: {new_neighbour}")
           
             # Extract IP and port for the new neighbour
-            n_ip, n_port = new_neighbour["ip"], new_neighbour["port"]
+            n_ip, n_port = new_neighbour["IPv4"], new_neighbour["Port"]
             # Send handshake to the new neighbour
             
             send_handshake((n_ip, n_port))
