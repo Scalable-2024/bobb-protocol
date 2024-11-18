@@ -44,6 +44,9 @@ def route_message():
         "priority": "high/medium/low" (optional)
     }
     """
+    middleware_response = check_headers()
+    if middleware_response is not True:
+        return middleware_response  # Return error if headers are invalid
     try:
         body = request.get_json()
 
