@@ -1,10 +1,9 @@
 #!/bin/bash
 
 # Check if Rust is installed
-if ! command -v rustc &> /dev/null; then
+if ! rustc --version &> /dev/null; then
     echo "Rust is not installed. Installing Rust..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --profile default -y
-    source $HOME/.cargo/env
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --profile default -y &> /dev/null;
 
     # Verify the installation
     if rustc --version &> /dev/null; then
