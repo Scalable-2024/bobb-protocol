@@ -218,8 +218,9 @@ def send_heartbeat_to_neighbours():
 def manage_neighbours():
     """Periodically remove and add neighbours."""
     while True:
-        time.sleep(random.randint(20, 30))
-        print(f"[DEBUG] Sleeping for {time.sleep} seconds before managing neighbours.")
+        sleep_time = random.randint(20, 30)
+        print(f"[DEBUG] Sleeping for {sleep_time} seconds before managing neighbours.")
+        # time.sleep(random.randint(20, 30))
         # Remove a random neighbour
         print("[DEBUG] Loading neighbours and blocklist files.")
         with open(neighbours_file, 'r') as f:
@@ -274,9 +275,10 @@ def manage_neighbours():
             #     requests.post(url, json=payload, verify=False, timeout=5, proxies=proxies)
             # except requests.RequestException:
             #     pass
-
-        time.sleep(random.randint(20, 30))
-        print(f"[DEBUG] Sleeping for {time.sleep} seconds before adding a new neighbour.")
+        
+        # time sleep for discovery .. optional
+        # time.sleep(random.randint(20, 30))
+        # print(f"[DEBUG] Sleeping for {time.sleep} seconds before adding a new neighbour.")
         # Add a neighbour from the to_be_discovered CSV
         if os.path.exists(to_be_discovered_csv):
             print("[DEBUG] Loading to_be_discovered CSV.")
