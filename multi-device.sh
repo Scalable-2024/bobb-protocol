@@ -41,17 +41,19 @@ fi
 
 
 # Check if Rust is installed
-. $HOME/.cargo/env
-if ! rustc --version &> /dev/null; then
-    echo "Rust is not installed. Installing Rust..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --profile default -y &> /dev/null;
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     . $HOME/.cargo/env
-    # Verify the installation
-    if rustc --version &> /dev/null; then
-        echo "Rust has been installed successfully."
-    else
-        echo "Rust installation failed. Exiting."
-        exit 1
+    if ! rustc --version &> /dev/null; then
+        echo "Rust is not installed. Installing Rust..."
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --profile default -y &> /dev/null;
+        . $HOME/.cargo/env
+        # Verify the installation
+        if rustc --version &> /dev/null; then
+            echo "Rust has been installed successfully."
+        else
+            echo "Rust installation failed. Exiting."
+            exit 1
+        fi
     fi
 fi
 
