@@ -1,13 +1,14 @@
 import base64
 import os
 
-from flask import Blueprint
+from flask import Blueprint, app, jsonify
 
 from src.config.constants import SATELLITE_FUNCTION_DISASTER_IMAGING, BASESTATION
 from src.controllers.create_headers import create_header
 from src.controllers.hello import hello
 from src.controllers.identify import return_identity
 from src.controllers.handshake import handshake
+from src.heartbeat.heartbeat import heartbeat
 from src.middleware.header_middleware import check_headers
 
 router = Blueprint('main', __name__)
@@ -37,6 +38,15 @@ def receive_handshake():
 
     # Call controller function if headers are valid
     return handshake()
+
+@router.route('/heartbeat', methods=["POST"])
+def receive_heartbeat():
+    middleware_response = check_headers()
+    if middleware_response is not True:
+        return middleware_response  # Return error if headers are invalid
+
+    # Call controller function if headers are valid
+    return heartbeat()
 
 # Base station routes
 
