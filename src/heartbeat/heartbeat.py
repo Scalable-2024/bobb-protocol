@@ -225,22 +225,26 @@ def send_heartbeat_to_neighbours():
 
 def manage_neighbours():
     """Periodically remove and add neighbours."""
+    own_port = os.getenv("PORT")
+    own_ip = os.getenv("IP")
     while True:
-        sleep_time = random.randint(20, 30)
-        print(f"[DEBUG] Sleeping for {sleep_time} seconds before managing neighbours.")
-        # time.sleep(random.randint(20, 30))
-        # Remove a random neighbour
+        time.sleep(10)
+
         print("[DEBUG] Loading neighbours and blocklist files.")
         with open(neighbours_file, 'r') as f:
             neighbours = json.load(f)
         with open(blocklist_file, 'r') as f:
             blocklist = json.load(f)
 
-        if neighbours:
-            print(f"[DEBUG] Neighbours list before removal: {neighbours}")
+        #if neighbours:
+        if len(neighbours) > 3:
+            #print(f"[DEBUG] Neighbours list before removal: {neighbours}")
             removed_neighbour = random.choice(neighbours)
             neighbours.remove(removed_neighbour)
-            print(f"[DEBUG] Removed neighbour: {removed_neighbour}")
+            print(removed_neighbour)
+            print(f"[INFO] The neighbour with IP {own_ip} and port {own_port} removed the neighbour with IP {removed_neighbour['ip']} and port {removed_neighbour['port']}.")
+
+            #print(f"[DEBUG] Removed neighbour: {removed_neighbour}")
 
             # Check if the neighbour is already in the blocklist before adding
             if not any(
@@ -256,38 +260,10 @@ def manage_neighbours():
                 json.dump(neighbours, f, indent=4)
             with open(blocklist_file, 'w') as f:
                 json.dump(blocklist, f, indent=4)
+        else:
+             print("[INFO] Skipping removal to avoid empty neighbour list.")
 
-            removed_neighbour_file = f'resources/satellite_neighbours/neighbours_{removed_neighbour["port"]}.json'
-            if os.path.exists(removed_neighbour_file):
-                print(f"[DEBUG] Found neighbour file for mutual removal: {removed_neighbour_file}")
-                with open(removed_neighbour_file, 'r') as f:
-                    removed_neighbours = json.load(f)
-
-                # Remove this satellite from the removed neighbor's list
-                removed_neighbours = [
-                    n for n in removed_neighbours
-                    if not (n['ip'] == our_ip and n['port'] == int(our_port))
-                ]
-                print(f"[DEBUG] Updated neighbour file after mutual removal: {removed_neighbours}")
-
-                # Save updated file
-                with open(removed_neighbour_file, 'w') as f:
-                    json.dump(removed_neighbours, f, indent=4)
-            else:
-                print(f"[DEBUG] Neighbour file not found for mutual removal: {removed_neighbour_file}")
-
-            # Notify the removed neighbour
-            # try:
-            #     url = f"https://{removed_neighbour['ip']}:{removed_neighbour['port']}/remove_neighbour"
-            #     payload = {"satellite_id": f"{our_ip}:{our_port}"}
-            #     requests.post(url, json=payload, verify=False, timeout=5, proxies=proxies)
-            # except requests.RequestException:
-            #     pass
-        
-        # time sleep for discovery .. optional
-        # time.sleep(random.randint(20, 30))
-        # print(f"[DEBUG] Sleeping for {time.sleep} seconds before adding a new neighbour.")
-        # Add a neighbour from the to_be_discovered CSV
+        time.sleep(10)
         if os.path.exists(to_be_discovered_csv):
             print("[DEBUG] Loading to_be_discovered CSV.")
             with open(to_be_discovered_csv, 'r') as f:
@@ -297,7 +273,7 @@ def manage_neighbours():
             to_be_discovered = []
 
         if to_be_discovered:
-            print(f"[DEBUG] to_be_discovered list before adding: {to_be_discovered}")
+           # print(f"[DEBUG] to_be_discovered list before adding: {to_be_discovered}")
             # Remove the first satellite from the to_be_discovered list
             new_neighbour = to_be_discovered.pop(0)
             print(f"[DEBUG] Adding new neighbour from to_be_discovered: {new_neighbour}")
@@ -314,20 +290,4 @@ def manage_neighbours():
                 writer.writeheader()
                 writer.writerows(to_be_discovered)
             print(f"[DEBUG] Updated to_be_discovered list: {to_be_discovered}")
-        else:
-            print("[DEBUG] No neighbours left in to_be_discovered.")
-
-
-
-        # Add a neighbour from the to_be_discovered list
-        # with open(to_be_discovered_file, 'r') as f:
-        #     to_be_discovered = json.load(f)
-        #
-        # if to_be_discovered:
-        #     new_neighbour = to_be_discovered.pop(0)
-        #     neighbours.append(new_neighbour)
-        #     with open(neighbours_file, 'w') as f:
-        #         json.dump(neighbours, f, indent=4)
-        #     with open(to_be_discovered_file, 'w') as f:
-        #         json.dump(to_be_discovered, f, indent=4)
 
