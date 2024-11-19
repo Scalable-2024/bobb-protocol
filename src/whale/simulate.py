@@ -6,6 +6,7 @@ import sys
 import socket
 import requests
 import signal
+import math
 from src.utils.headers import necessary_headers
 from src.discovery.discovery import find_x_satellites
 from src.config.constants import BASESTATION
@@ -41,7 +42,7 @@ class WhaleModel:
         whale_data_points = []
         
         # create sample data points for every 60 seconds since the time_since_surfaced
-        for i in range(time_since_surfaced // 60):
+        for i in range(math.ceil(time_since_surfaced / 60)):
             whale_data_point = {
                 "whale_id": self.whale_id,
                 "timestamp": int(time.time()),
@@ -66,6 +67,8 @@ class WhaleModel:
         
         # Whale data collected since last surfaced
         sample_data = self.generate_whale_data(time_since_surfaced)
+        print(time_since_surfaced)
+        print(sample_data)
 
         # Prepare header
         header = necessary_headers.BobbHeaders(
