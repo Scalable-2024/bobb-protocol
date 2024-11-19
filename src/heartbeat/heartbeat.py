@@ -55,25 +55,25 @@ if not os.path.exists(to_be_discovered_csv):
         
         
 
-def safe_load_json(file_path):
-    """
-    Safely load JSON data from a file.
-    If the file is empty or contains invalid JSON, return an empty dictionary.
-    """
-    try:
-        with open(file_path, 'r') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+# def safe_load_json(file_path):
+#     """
+#     Safely load JSON data from a file.
+#     If the file is empty or contains invalid JSON, return an empty dictionary.
+#     """
+#     try:
+#         with open(file_path, 'r') as f:
+#             return json.load(f)
+#     except (FileNotFoundError, json.JSONDecodeError):
+#         return {}
 
 
-def safe_save_json(file_path, data):
-    """
-    Safely save JSON data to a file, creating directories if necessary.
-    """
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    with open(file_path, 'w') as f:
-        json.dump(data, f, indent=4)
+# def safe_save_json(file_path, data):
+#     """
+#     Safely save JSON data to a file, creating directories if necessary.
+#     """
+#     os.makedirs(os.path.dirname(file_path), exist_ok=True)
+#     with open(file_path, 'w') as f:
+#         json.dump(data, f, indent=4)
 
 
 def update_last_contact(ip, port):
@@ -82,14 +82,18 @@ def update_last_contact(ip, port):
     in the neighbours_<our_port>.json file.
     """
 
-    neighbours_data = safe_load_json(neighbours_file)
+    # neighbours_data = safe_load_json(neighbours_file)
+    with open(neighbours_file, 'r') as f:
+        neighbours_data = json.load(f)
     
     for neighbour in neighbours_data:
         if neighbour['ip'] == ip and neighbour['port'] == port:
             neighbour['last_contact'] = int(time.time())
             break
     
-    safe_save_json(neighbours_file, neighbours_data)
+    # safe_save_json(neighbours_file, neighbours_data)
+    with open(neighbours_file, 'w') as f:
+        json.dump(neighbours_data, f, indent=4)
 
 def heartbeat():
     received_constellation = request.json.get("constellation", {}) if request.json else {}
@@ -123,7 +127,9 @@ def heartbeat():
 
     # Save the updated constellation data
 
-    safe_save_json(constellation_file, our_constellation)
+    # safe_save_json(constellation_file, our_constellation)
+    with open(constellation_file, 'w') as f:
+        json.dump(our_constellation, f, indent=4)
 
 
     
@@ -174,7 +180,9 @@ def send_heartbeat_to_neighbours():
             print(f"Neighbour {neighbour['ip']}:{neighbour['port']} has timed out and will be removed.")
 
     # Save the updated list of valid neighbours
-    safe_save_json(neighbours_file, valid_neighbours)
+    # safe_save_json(neighbours_file, valid_neighbours)
+        with open(neighbours_file, 'w') as f:
+            json.dump(valid_neighbours, f, indent=4)
     
     # print(f"Neighbours : {neighbours}")
     # print(f'Neighbours urls: {neighbour_urls}')
@@ -200,13 +208,15 @@ def send_heartbeat_to_neighbours():
             }
         }
         # Write to the file
-        safe_save_json(constellation_file, satellite_data)
+        with open(constellation_file, 'w') as f:
+            json.dump(satellite_data, f, indent=4)
         
         # Assign the initial data to constellation_data
         constellation_data = satellite_data
     else:
         # File exists, read the existing data
-        constellation_data = safe_load_json(constellation_file)
+        with open(constellation_file, 'r') as f:
+            constellation_data = json.load(f)
         
         # Our satellite ID
         satellite_id = f"{our_ip}:{our_port}"
@@ -219,7 +229,8 @@ def send_heartbeat_to_neighbours():
         }
 
         # Write the updated constellation data back to the JSON file
-        safe_save_json(constellation_file, constellation_data)
+        with open(constellation_file, 'w') as f:
+            json.dump(constellation_data, f, indent=4)
                 
     # Send POST requests to all neighbour URLs
     for url in neighbour_urls:
