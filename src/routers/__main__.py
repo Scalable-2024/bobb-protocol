@@ -63,7 +63,10 @@ def call_satellite_from_whale():
         current_satellite = f"{current_ip}:{current_port}"
 
         if destination == current_satellite:
-            print("ARRIVEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"*100)
+            device_type = os.getenv("DEVICE_TYPE")
+            if device_type != BASESTATION:
+                device_type = f"Satellite with function {device_type}"
+            print(f"Message {message} arrived at {device_type} from source {source}")
             return
 
         # If we've already been here, stop
