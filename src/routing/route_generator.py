@@ -356,7 +356,7 @@ def create_routing_tables():
                 json.dump(serializable_routes, f, indent=4)
                 f.close()
 
-            print(f"Generated routes for satellite {satellite_id}")
+            # print(f"Generated routes for satellite {satellite_id}")
 
 
 if __name__ == "__main__":

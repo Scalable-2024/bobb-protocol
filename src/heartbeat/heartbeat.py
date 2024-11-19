@@ -34,7 +34,7 @@ os.makedirs(os.path.dirname(neighbours_file), exist_ok=True)
 if not os.path.exists(neighbours_file):
     with open(neighbours_file, "w") as f:
         json.dump([], f, indent=4)
-    print(f"Created neighbors file: {neighbours_file}")
+    # print(f"Created neighbors file: {neighbours_file}")
 
 blocklist_file = f'resources/satellite_blocklists/blocklist_{our_port}.json'
 blocklist_dir = os.path.dirname(blocklist_file)
@@ -256,7 +256,7 @@ def send_heartbeat_to_neighbours():
             
             # response = requests.post(url, json={"constellation": constellation_data})
             if response.status_code == 200:
-                print(f"Heartbeat sent successfully to {url}")
+                # print(f"Heartbeat sent successfully to {url}")
 
                 # Parse the IP and port from the URL
                 url_components = url.split(':')
@@ -277,7 +277,7 @@ def manage_neighbours():
     own_ip = os.getenv("IP")
     # while True:
     # time.sleep(10)
-    print("[DEBUG] Loading neighbours and blocklist files.")
+    # print("[DEBUG] Loading neighbours and blocklist files.")
     with open(neighbours_file, 'r') as f:
         neighbours = json.load(f)
     with open(blocklist_file, 'r') as f:
@@ -287,7 +287,7 @@ def manage_neighbours():
         #print(f"[DEBUG] Neighbours list before removal: {neighbours}")
         removed_neighbour = random.choice(neighbours)
         neighbours.remove(removed_neighbour)
-        print(removed_neighbour)
+        # print(removed_neighbour)
         print(f"[INFO] The neighbour with IP {own_ip} and port {own_port} removed the neighbour with IP {removed_neighbour['ip']} and port {removed_neighbour['port']}.")
         #print(f"[DEBUG] Removed neighbour: {removed_neighbour}")
         # Check if the neighbour is already in the blocklist before adding
@@ -298,7 +298,7 @@ def manage_neighbours():
                 for n in blocklist
         ):
             blocklist.append(removed_neighbour)
-            print(f"[DEBUG] Added to blocklist: {removed_neighbour}")
+            # print(f"[DEBUG] Added to blocklist: {removed_neighbour}")
         with open(neighbours_file, 'w') as f:
             json.dump(neighbours, f, indent=4)
         with open(blocklist_file, 'w') as f:
@@ -307,17 +307,17 @@ def manage_neighbours():
          print("[INFO] Skipping removal to avoid empty neighbour list.")
     # time.sleep(10)
     if os.path.exists(to_be_discovered_csv):
-        print("[DEBUG] Loading to_be_discovered CSV.")
+        # print("[DEBUG] Loading to_be_discovered CSV.")
         with open(to_be_discovered_csv, 'r') as f:
             to_be_discovered = list(csv.DictReader(f))
     else:
-        print("[DEBUG] to_be_discovered CSV not found. Initializing empty list.")
+        # print("[DEBUG] to_be_discovered CSV not found. Initializing empty list.")
         to_be_discovered = []
     if to_be_discovered:
        # print(f"[DEBUG] to_be_discovered list before adding: {to_be_discovered}")
         # Remove the first satellite from the to_be_discovered list
         new_neighbour = to_be_discovered.pop(0)
-        print(f"[DEBUG] Adding new neighbour from to_be_discovered: {new_neighbour}")
+        # print(f"[DEBUG] Adding new neighbour from to_be_discovered: {new_neighbour}")
       
         # Extract IP and port for the new neighbour
         n_ip, n_port = new_neighbour["IPv4"], new_neighbour["Port"]
@@ -328,9 +328,9 @@ def manage_neighbours():
         # Write updated neighbours and to_be_discovered lists to their respective files
         # with open(neighbours_file, 'w') as f:
         #     json.dump(neighbours, f, indent=4)
-        print(f"[DEBUG] Updated neighbours list: {neighbours}")
+        # print(f"[DEBUG] Updated neighbours list: {neighbours}")
         with open(to_be_discovered_csv, 'w', newline="") as f:
             writer = csv.DictWriter(f, fieldnames=new_neighbour.keys())
             writer.writeheader()
             writer.writerows(to_be_discovered)
-        print(f"[DEBUG] Updated to_be_discovered list: {to_be_discovered}")
+        # print(f"[DEBUG] Updated to_be_discovered list: {to_be_discovered}")
