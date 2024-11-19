@@ -71,8 +71,9 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
         ip = os.getenv("IP")
         # If on a private IP address, assume raspberry pis
         if ip is not None and ip.split('.')[0] == "10":
+            pis = ['1', '2', '12', '16', '24', '33', '37', '48']
             # Default list of ips to check - raspberry pi IPs
-            ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+            ips_to_check = ["10.35.70."+str(extension) for extension in pis]
         else:
             ips_to_check = ["localhost"]  # <- for local testing
 
