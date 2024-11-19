@@ -1,13 +1,6 @@
-from xml.sax.handler import property_interning_dict
-
 import requests
-from flask import Blueprint, app, jsonify, request  # Add request here
-import base64
-import json
 import os
-
-from flask import Blueprint, app, jsonify
-
+from flask import Blueprint, app, jsonify, request
 from src.config.constants import SATELLITE_FUNCTION_DISASTER_IMAGING, BASESTATION
 from src.controllers.create_headers import create_header
 from src.controllers.hello import hello

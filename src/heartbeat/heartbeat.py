@@ -99,9 +99,6 @@ def heartbeat():
         create_routing_tables()
     except Exception as e:
         print(f"Error creating routing tables: {e}")
-
-
-
         
     return jsonify({"message": "Constellation data processed"}), 200
 
