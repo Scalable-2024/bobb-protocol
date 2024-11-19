@@ -67,14 +67,14 @@ def check_device_type(ipv4, port, endpoint, verbose):
 def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5, port=None):
     results = []
 
-    ip = os.getenv("IP")
-    # If on a private IP address, assume raspberry pis
-    if ip.split('.')[0] == "10":
-        # Default list of ips to check - raspberry pi IPs
-        if ips_to_check is None:
+    if ips_to_check is None:
+        ip = os.getenv("IP")
+        # If on a private IP address, assume raspberry pis
+        if ip is not None and ip.split('.')[0] == "10":
+            # Default list of ips to check - raspberry pi IPs
             ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
-    else:
-        ips_to_check = ["localhost"]  # <- for local testing
+        else:
+            ips_to_check = ["localhost"]  # <- for local testing
 
     for ip in ips_to_check:
         contact_time = ping_with_contact_time(ip)
