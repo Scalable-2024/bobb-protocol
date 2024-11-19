@@ -111,7 +111,7 @@ def main(num_whales, min_diving_time, max_diving_time, min_surface_time, max_sur
     signal.signal(signal.SIGINT, handle_sigint)
 
     whales = []
-    base_port = 5000
+    base_port = 33700
 
     hostname = socket.gethostname()
     ip = socket.getaddrinfo(hostname, None, socket.AF_INET)[0][4][0]
