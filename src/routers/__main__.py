@@ -64,6 +64,10 @@ def call_satellite_from_whale():
         current_ip = os.getenv("IP")
         current_satellite = f"{current_ip}:{current_port}"
 
+        if destination == current_satellite:
+            print("ARRIVEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"*100)
+            return
+
         # If we've already been here, stop
         if current_satellite in hops:
             return jsonify({
@@ -84,8 +88,7 @@ def call_satellite_from_whale():
         hops.append(current_satellite)
 
         # Read satellite listings file
-        listings_file = f"resources/satellite_listings/full_satellite_listing_{
-            current_port}.csv"
+        listings_file = f"resources/satellite_listings/full_satellite_listing_{current_port}.csv"
         available_satellites = []
 
         with open(listings_file, 'r') as f:

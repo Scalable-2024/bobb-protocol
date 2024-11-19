@@ -65,7 +65,7 @@ class WhaleModel:
         surface_time = random.randint(self.min_surface_time, self.max_surface_time)
         
         # Whale data collected since last surfaced
-        sample_data = self.generate_whale_data(self, time_since_surfaced)
+        sample_data = self.generate_whale_data(time_since_surfaced)
 
         # Prepare header
         header = necessary_headers.BobbHeaders(
@@ -85,7 +85,7 @@ class WhaleModel:
         # Send acknowledgment request to satellite
         try:
             # TODO: enable verification
-            response = requests.post(f"https://{self.satellite_ip}:{self.satellite_port}/route", verify=False, timeout=surface_time, proxies=proxies, json= {
+            response = requests.post(f"https://{self.satellite_ip}:{self.satellite_port}/call_satellite_from_whale", verify=False, timeout=surface_time, proxies=proxies, headers=headers, json= {
                 "source": f"{self.ip}:{self.port}",
                 "destination": f"{self.destination_ip}:{self.destination_port}",
                 "message": sample_data,
