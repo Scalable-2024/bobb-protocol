@@ -45,3 +45,12 @@ def check_headers():
 
     # If headers are valid
     return True
+
+def extract_bobb_headers():
+    """
+    Extracts BobbHeaders and BobbOptionalHeaders from the global context.
+    """
+    custom_header = request.headers.get(X_BOBB_HEADER)
+    bobb = BobbHeaders()
+    bobb_header = bobb.parse_header(bytes.fromhex(custom_header))
+    return bobb_header

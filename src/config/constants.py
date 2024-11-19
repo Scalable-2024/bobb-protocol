@@ -29,3 +29,4 @@ SATELLITE_FUNCTION_POST_FLOOD_SURVIVOR_DETECTION_AERIALDRONES = "post-flood-surv
 
 # Timeout limit for neighbour last contact (90 seconds)
 MAX_TIMEOUT = 90
+
