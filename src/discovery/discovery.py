@@ -69,12 +69,12 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
 
     ip = os.getenv("IP")
     # If on a private IP address, assume raspberry pis
-    # if ip.split('.')[0] == "10":
-    #     # Default list of ips to check - raspberry pi IPs
-    #     if ips_to_check is None:
-    #         ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
-    # else:
-    ips_to_check = ["localhost"]  # <- for local testing
+    if ip.split('.')[0] == "10":
+        # Default list of ips to check - raspberry pi IPs
+        if ips_to_check is None:
+            ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+    else:
+        ips_to_check = ["localhost"]  # <- for local testing
 
     for ip in ips_to_check:
         contact_time = ping_with_contact_time(ip)
@@ -113,14 +113,45 @@ def get_neighbouring_satellites():
 
     base_dir = os.getcwd()
     directory_path = os.path.join(base_dir, "resources", "satellite_listings")
+    discovery_dir = os.path.join(base_dir, "resources", "to_be_discovered")
+    
+    
     file_name = os.path.join(directory_path, f"full_satellite_listing_{port}.csv")
+    discovery_file = os.path.join(discovery_dir, f"to_be_discovered_{port}.csv")
+    
     os.makedirs(directory_path, exist_ok=True)
+    os.makedirs(discovery_dir, exist_ok=True)
+    
+    # Calculate the number of satellites to move to the to-be-discovered list (5% of the total)
+    total_satellites = len(starter_satellite_list)
+    discovery_count = max(1, int(total_satellites * 0.05))  # Ensure at least 1 satellite is selected
 
-    with open(file_name, "w", newline="") as csvfile:
-        # print(f"Writing to {file_name}")
-        fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(starter_satellite_list)
+    # Split the starter list into to-be-discovered and remaining satellites
+    to_be_discovered = starter_satellite_list[:discovery_count]  # First 5% for discovery
+    remaining_satellites = starter_satellite_list[discovery_count:]  # Remaining 95%
+    print(f"[DEBUG] To-be-discovered satellites: {len(to_be_discovered)}")
+    print(f"[DEBUG] Remaining satellites: {len(remaining_satellites)}")
+    # Write the remaining satellites to the full satellite listing file
+    try:
+        with open(file_name, "w", newline="") as csvfile:
+            print(f"[DEBUG] Writing full satellite listing to {file_name}")
+            fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(remaining_satellites)  # Write the remaining satellites to the file
+            csvfile.close()
+    except Exception as e:
+        print(f"[ERROR] Failed to write full satellite listing: {e}")
+    # Write the to-be-discovered satellites to the discovery file
+    try:
+        with open(discovery_file, "w", newline="") as csvfile:
+            print(f"[DEBUG] Writing to_be_discovered list to {discovery_file}")
+            fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(to_be_discovered)  # Write the to-be-discovered satellites to the file
+    except Exception as e:
+        print(f"[ERROR] Failed to write to_be_discovered list: {e}")
+
 
     send_handshakes()
