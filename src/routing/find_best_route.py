@@ -18,8 +18,8 @@ from typing import Dict, List, Optional, Tuple
 
 
 class RouteType(Enum):
-    DIRECT = 4
-    FUNCTION = 3
+    DIRECT = 10
+    FUNCTION_BASED = 3
     BALANCED = 2
     RANDOM = 1
 
@@ -43,6 +43,7 @@ def find_best_route(source: str, destination: str, priority: str = "medium") -> 
 
         with open(routes_file, 'r') as f:
             routing_table = json.load(f)
+            f.close()
 
         if destination not in routing_table[source]:
             return None
@@ -53,19 +54,19 @@ def find_best_route(source: str, destination: str, priority: str = "medium") -> 
         priority_weights = {
             "high": {
                 "DIRECT": 1.0,
-                "FUNCTION": 0.8,
+                "FUNCTION_BASED": 0.8,
                 "BALANCED": 0.6,
                 "RANDOM": 0.4
             },
             "medium": {
                 "DIRECT": 0.8,
-                "FUNCTION": 1.0,
+                "FUNCTION_BASED": 1.0,
                 "BALANCED": 0.8,
                 "RANDOM": 0.6
             },
             "low": {
                 "DIRECT": 0.6,
-                "FUNCTION": 0.8,
+                "FUNCTION_BASED": 0.8,
                 "BALANCED": 1.0,
                 "RANDOM": 0.8
             }
@@ -74,6 +75,7 @@ def find_best_route(source: str, destination: str, priority: str = "medium") -> 
         # Score each route based on type and metrics
         scored_routes = []
         for route in available_routes:
+            print(route)
             base_weight = RouteType[route["type"]].value
             priority_weight = priority_weights[priority][route["type"]]
 
@@ -89,9 +91,7 @@ def find_best_route(source: str, destination: str, priority: str = "medium") -> 
 
         # Select best route
         best_route = max(scored_routes, key=lambda x: x["score"])
-
-        # Add routing table for context
-        best_route["routing_table"] = routing_table[source]
+        print(best_route)
 
         return best_route
 

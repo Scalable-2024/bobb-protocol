@@ -122,5 +122,6 @@ def get_neighbouring_satellites():
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(starter_satellite_list)
+        csvfile.close()
 
     send_handshakes()

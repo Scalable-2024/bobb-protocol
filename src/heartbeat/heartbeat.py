@@ -70,6 +70,7 @@ def heartbeat():
     try:
         with open(constellation_file, 'r') as f:
             our_constellation = json.load(f)
+            f.close()
     except (FileNotFoundError, json.JSONDecodeError):
         our_constellation = {}
     
@@ -94,7 +95,10 @@ def heartbeat():
     # Save the updated constellation data
     safe_save_json(constellation_file, our_constellation)
 
-    updated = create_routing_tables()
+    try:
+        create_routing_tables()
+    except Exception as e:
+        print(f"Error creating routing tables: {e}")
 
 
 
