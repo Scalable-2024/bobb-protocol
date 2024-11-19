@@ -5,7 +5,7 @@ python3 -m venv bobb_venv
 source ./bobb_venv/bin/activate
 
 echo "Installing Python dependencies"
-pip3 install -r requirements.txt > /dev/null 2>&1
+pip3 install -r requirements.txt 
 
 # Default to port 33001 if not provided
 PORT=${1:-33001}
