@@ -56,11 +56,11 @@ def get_random_basestation(port):
 
 def send_disaster_relieve_message():
     device_function = os.getenv("DEVICE_FUNCTION")
-    print(device_function)
+    # print(device_function)
 
     if device_function != SATELLITE_FUNCTION_DISASTER_IMAGING:
-        print(f"Device function is {device_function}: {SATELLITE_FUNCTION_DISASTER_IMAGING}")
-        print("Not a disaster imaging satellite")
+        # print(f"Device function is {device_function}: {SATELLITE_FUNCTION_DISASTER_IMAGING}")
+        # print("Not a disaster imaging satellite")
         return
 
     city = get_random_city()
