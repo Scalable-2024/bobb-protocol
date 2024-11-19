@@ -10,5 +10,5 @@ rsa
 requests
 APScheduler
 cryptography
-# networkx
+networkx
 # matplotlib
