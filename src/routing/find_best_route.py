@@ -77,7 +77,7 @@ def find_best_route(source: str, destination: str, priority: str = "medium") -> 
         # Score each route based on type and metrics
         scored_routes = []
         for route in available_routes:
-            print(route)
+            # print(route)
             base_weight = RouteType[route["type"]].value
             priority_weight = priority_weights[priority][route["type"]]
 
@@ -93,7 +93,7 @@ def find_best_route(source: str, destination: str, priority: str = "medium") -> 
 
         # Select best route
         best_route = max(scored_routes, key=lambda x: x["score"])
-        print(best_route)
+        # print(best_route)
 
         return best_route
 

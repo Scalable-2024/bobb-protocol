@@ -182,7 +182,7 @@ def route_message():
         max_attempts = 3  # Maximum number of complete route attempts
 
         for attempt in range(max_attempts):
-            print(f"Attempt {attempt + 1} of {max_attempts}")
+            # print(f"Attempt {attempt + 1} of {max_attempts}")
 
             # Try to find a route
             route_info = find_best_route(source, destination, priority)
@@ -197,7 +197,7 @@ def route_message():
             # Try each hop in the route
             for hop in current_path:
                 if simulate_satellite_failure(hop):
-                    print(f"Satellite {hop} failed on attempt {attempt + 1}")
+                    # print(f"Satellite {hop} failed on attempt {attempt + 1}")
                     failed_satellites.append(hop)
 
                     # Try up to 3 alternate routes from last working point
@@ -211,7 +211,7 @@ def route_message():
                         )
 
                         if alternate_route:
-                            print(f"Found alternate route on attempt {alternate_attempt + 1}")
+                            # print(f"Found alternate route on attempt {alternate_attempt + 1}")
                             working_path.extend(alternate_route["path"])
                             route_info = alternate_route
                             route_failed = False

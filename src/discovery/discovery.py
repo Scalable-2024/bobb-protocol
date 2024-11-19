@@ -129,12 +129,12 @@ def get_neighbouring_satellites():
     # Split the starter list into to-be-discovered and remaining satellites
     to_be_discovered = starter_satellite_list[:discovery_count]  # First 5% for discovery
     remaining_satellites = starter_satellite_list[discovery_count:]  # Remaining 95%
-    print(f"[DEBUG] To-be-discovered satellites: {len(to_be_discovered)}")
-    print(f"[DEBUG] Remaining satellites: {len(remaining_satellites)}")
+    # print(f"[DEBUG] To-be-discovered satellites: {len(to_be_discovered)}")
+    # print(f"[DEBUG] Remaining satellites: {len(remaining_satellites)}")
     # Write the remaining satellites to the full satellite listing file
     try:
         with open(file_name, "w", newline="") as csvfile:
-            print(f"[DEBUG] Writing full satellite listing to {file_name}")
+            # print(f"[DEBUG] Writing full satellite listing to {file_name}")
             fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
@@ -145,7 +145,7 @@ def get_neighbouring_satellites():
     # Write the to-be-discovered satellites to the discovery file
     try:
         with open(discovery_file, "w", newline="") as csvfile:
-            print(f"[DEBUG] Writing to_be_discovered list to {discovery_file}")
+            # print(f"[DEBUG] Writing to_be_discovered list to {discovery_file}")
             fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
