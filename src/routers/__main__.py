@@ -108,7 +108,7 @@ def call_satellite_from_whale():
         try:
             # Forward the request to random satellite with timeout
             forward_response = requests.post(
-                f"https://{random_satellite}/call_satellite_from_whale",
+                f"https://{random_satellite}/route",
                 json={
                     "source": source,
                     "destination": destination,

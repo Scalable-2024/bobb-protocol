@@ -53,19 +53,19 @@ def find_best_route(source: str, destination: str, priority: str = "medium") -> 
         priority_weights = {
             "high": {
                 "DIRECT": 1.0,
-                "FUNCTION": 0.8,
+                "FUNCTION_BASED": 0.8,
                 "BALANCED": 0.6,
                 "RANDOM": 0.4
             },
             "medium": {
                 "DIRECT": 0.8,
-                "FUNCTION": 1.0,
+                "FUNCTION_BASED": 1.0,
                 "BALANCED": 0.8,
                 "RANDOM": 0.6
             },
             "low": {
                 "DIRECT": 0.6,
-                "FUNCTION": 0.8,
+                "FUNCTION_BASED": 0.8,
                 "BALANCED": 1.0,
                 "RANDOM": 0.8
             }
