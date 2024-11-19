@@ -4,7 +4,7 @@ import threading
 import os
 from flask import Flask, request, g
 from src.config.config import load_from_config_file
-from src.heartbeat.heartbeat import send_heartbeat_to_neighbours
+from src.heartbeat.heartbeat import manage_neighbours, send_heartbeat_to_neighbours
 from src.routers.__main__ import router as main_router
 from src.utils.crypto_utils import generate_keys
 from src.utils.headers.necessary_headers import BobbHeaders
@@ -41,11 +41,13 @@ def schedule_activities_once_started_up():
 
     # Schedule satellite discovery every 5 minutes
     # TODO once testing is done, return to 5 minutes
-    # scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(minutes=1), id='device_discovery', replace_existing=True)
-    scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(seconds=15), id='device_discovery', replace_existing=True)
+    scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(minutes=5), id='device_discovery', replace_existing=True)
+    # scheduler.add_job(func=get_neighbouring_satellites, trigger=IntervalTrigger(seconds=15), id='device_discovery', replace_existing=True)
 
     # Schedule heartbeat every 30s
     scheduler.add_job(func=send_heartbeat_to_neighbours, trigger=IntervalTrigger(seconds=30), id='sending_heartbeats', replace_existing=True)
+    
+    scheduler.add_job(func=manage_neighbours, trigger=IntervalTrigger(seconds=45), id='managing neighbours', replace_existing=True)
 
 thread = threading.Thread(target=initial_satellite_search)
 thread.start()

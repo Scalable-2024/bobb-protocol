@@ -64,7 +64,7 @@ def check_device_type(ipv4, port, endpoint, verbose):
             print(f"Got error: {e}")
         return None
     
-def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5, port=None):
+def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33030, endpoint="id", x=10, port=None): #33100 to
     results = []
 
     ip = os.getenv("IP")
@@ -108,19 +108,69 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
 # This is because we need the ip addresses to simulate communication.
 # It should return the intended neighbour satellites - for now, just the ones with the lowest latency.
 def get_neighbouring_satellites():
+    # Get the port number from the environment variable
     port = os.getenv("PORT")
-    starter_satellite_list = find_x_satellites(port=int(port))
 
+    #starter_satellite_list = find_x_satellites(port=int(port))
+
+    # Find a list of 20 potential satellites using the specified port
+    print("[DEBUG] Starting satellite discovery...")
+    starter_satellite_list = find_x_satellites(x=10, port=int(port))
+    print(f"[DEBUG] Discovered {len(starter_satellite_list)} satellites.")
+
+    # Define the base directory for resources
     base_dir = os.getcwd()
-    directory_path = os.path.join(base_dir, "resources", "satellite_listings")
-    file_name = os.path.join(directory_path, f"full_satellite_listing_{port}.csv")
-    os.makedirs(directory_path, exist_ok=True)
+    print(f"[DEBUG] Base directory: {base_dir}")
 
-    with open(file_name, "w", newline="") as csvfile:
-        # print(f"Writing to {file_name}")
-        fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(starter_satellite_list)
+    # Define paths for satellite listings and to-be-discovered directories
+    directory_path = os.path.join(base_dir, "resources", "satellite_listings")
+    discovery_dir = os.path.join(base_dir, "resources", "to_be_discovered")
+    
+    
+    file_name = os.path.join(directory_path, f"full_satellite_listing_{port}.csv")
+    discovery_file = os.path.join(discovery_dir, f"to_be_discovered_{port}.csv")
+    
+    os.makedirs(directory_path, exist_ok=True)
+    os.makedirs(discovery_dir, exist_ok=True)
+    
+    # Calculate the number of satellites to move to the to-be-discovered list (5% of the total)
+    total_satellites = len(starter_satellite_list)
+    discovery_count = max(1, int(total_satellites * 0.05))  # Ensure at least 1 satellite is selected
+
+    # Split the starter list into to-be-discovered and remaining satellites
+    to_be_discovered = starter_satellite_list[:discovery_count]  # First 5% for discovery
+    remaining_satellites = starter_satellite_list[discovery_count:]  # Remaining 95%
+    print(f"[DEBUG] To-be-discovered satellites: {len(to_be_discovered)}")
+    print(f"[DEBUG] Remaining satellites: {len(remaining_satellites)}")
+    # Write the remaining satellites to the full satellite listing file
+    try:
+        with open(file_name, "w", newline="") as csvfile:
+            print(f"[DEBUG] Writing full satellite listing to {file_name}")
+            fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(remaining_satellites)  # Write the remaining satellites to the file
+    except Exception as e:
+        print(f"[ERROR] Failed to write full satellite listing: {e}")
+    # Write the to-be-discovered satellites to the discovery file
+    try:
+        with open(discovery_file, "w", newline="") as csvfile:
+            print(f"[DEBUG] Writing to_be_discovered list to {discovery_file}")
+            fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(to_be_discovered)  # Write the to-be-discovered satellites to the file
+    except Exception as e:
+        print(f"[ERROR] Failed to write to_be_discovered list: {e}")
+
+
+
+    # with open(file_name, "w", newline="") as csvfile:
+    #     # print(f"Writing to {file_name}")
+    #     fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
+    #     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    #     writer.writeheader()
+    #     writer.writerows(starter_satellite_list)
 
     send_handshakes()
+
