@@ -22,7 +22,7 @@ from typing import Dict, List, Optional, Tuple
 class RouteType(Enum):
     DIRECT = 10
     FUNCTION_BASED = 3
-    BALANCED = 2
+    LOAD_BALANCED = 2
     RANDOM = 1
 
 
@@ -57,19 +57,19 @@ def find_best_route(source: str, destination: str, priority: str = "medium") -> 
             "high": {
                 "DIRECT": 1.0,
                 "FUNCTION_BASED": 0.8,
-                "BALANCED": 0.6,
+                "LOAD_BALANCED": 0.6,
                 "RANDOM": 0.4
             },
             "medium": {
                 "DIRECT": 0.8,
                 "FUNCTION_BASED": 1.0,
-                "BALANCED": 0.8,
+                "LOAD_BALANCED": 0.8,
                 "RANDOM": 0.6
             },
             "low": {
                 "DIRECT": 0.6,
                 "FUNCTION_BASED": 0.8,
-                "BALANCED": 1.0,
+                "LOAD_BALANCED": 1.0,
                 "RANDOM": 0.8
             }
         }
