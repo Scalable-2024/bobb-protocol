@@ -6,7 +6,6 @@ from src.utils.headers.necessary_headers import BobbHeaders
 from src.config.constants import X_BOBB_HEADER
 from src.config.config import CONFIG_FILE_PATH
 from src.helpers.general_handshake_helper import create_handshake_message, write_received_handshake
-from src.helpers.send_handshake_helper import send_handshake
 
 # TODO allow self signed certificates
 import urllib3

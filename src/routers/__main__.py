@@ -84,8 +84,7 @@ def call_satellite_from_whale():
         hops.append(current_satellite)
 
         # Read satellite listings file
-        listings_file = f"resources/satellite_listings/full_satellite_listing_{
-            current_port}.csv"
+        listings_file = f"resources/satellite_listings/full_satellite_listing_{current_port}.csv"
         available_satellites = []
 
         with open(listings_file, 'r') as f:
@@ -207,8 +206,7 @@ def route_message():
                         )
 
                         if alternate_route:
-                            print(f"Found alternate route on attempt {
-                                  alternate_attempt + 1}")
+                            print(f"Found alternate route on attempt {alternate_attempt + 1}")
                             working_path.extend(alternate_route["path"])
                             route_info = alternate_route
                             route_failed = False

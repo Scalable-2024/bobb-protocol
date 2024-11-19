@@ -64,7 +64,7 @@ def check_device_type(ipv4, port, endpoint, verbose):
             print(f"Got error: {e}")
         return None
     
-def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33030, endpoint="id", x=10, port=None): #33100 to
+def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoint="id", x=5, port=None):
     results = []
 
     ip = os.getenv("IP")
@@ -108,21 +108,10 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33030, endpoin
 # This is because we need the ip addresses to simulate communication.
 # It should return the intended neighbour satellites - for now, just the ones with the lowest latency.
 def get_neighbouring_satellites():
-    # Get the port number from the environment variable
     port = os.getenv("PORT")
+    starter_satellite_list = find_x_satellites(port=int(port))
 
-    #starter_satellite_list = find_x_satellites(port=int(port))
-
-    # Find a list of 20 potential satellites using the specified port
-    print("[DEBUG] Starting satellite discovery...")
-    starter_satellite_list = find_x_satellites(x=10, port=int(port))
-    print(f"[DEBUG] Discovered {len(starter_satellite_list)} satellites.")
-
-    # Define the base directory for resources
     base_dir = os.getcwd()
-    print(f"[DEBUG] Base directory: {base_dir}")
-
-    # Define paths for satellite listings and to-be-discovered directories
     directory_path = os.path.join(base_dir, "resources", "satellite_listings")
     discovery_dir = os.path.join(base_dir, "resources", "to_be_discovered")
     
@@ -173,4 +162,3 @@ def get_neighbouring_satellites():
     #     writer.writerows(starter_satellite_list)
 
     send_handshakes()
-
