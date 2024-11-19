@@ -103,6 +103,7 @@ def heartbeat():
     try:
         with open(constellation_file, 'r') as f:
             our_constellation = json.load(f)
+            f.close()
     except (FileNotFoundError, json.JSONDecodeError):
         our_constellation = {}
 
@@ -131,8 +132,6 @@ def heartbeat():
     with open(constellation_file, 'w') as f:
         json.dump(our_constellation, f, indent=4)
 
-
-    
     try:
         create_routing_tables()
     except Exception as e:

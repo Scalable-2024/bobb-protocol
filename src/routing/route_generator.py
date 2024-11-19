@@ -46,6 +46,7 @@ class RouteGenerator:
     def _load_satellites(self) -> Dict[str, SatelliteNode]:
         with open(self.constellation_file, 'r') as f:
             constellation = json.load(f)
+            f.close()
 
         satellites = {}
         for sat_id, data in constellation.items():
@@ -328,6 +329,7 @@ def create_routing_tables():
                     sat_id for sat_id in constellation.keys()
                     if sat_id.endswith(f":{port}")
                 )
+                f.close()
 
             # Generate routes with all strategies
             routes = generate_all_routes(constellation_path)
@@ -352,6 +354,7 @@ def create_routing_tables():
                 routes_dir, f"{satellite_id}.json")  # Using full IP:port
             with open(routes_file, 'w') as f:
                 json.dump(serializable_routes, f, indent=4)
+                f.close()
 
             print(f"Generated routes for satellite {satellite_id}")
 

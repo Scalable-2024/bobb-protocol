@@ -4,8 +4,6 @@ from flask import Blueprint, app, jsonify, request  # Add request here
 import base64
 import json
 import os
-
-from flask import Blueprint, app, jsonify
 import requests
 
 from src.config.constants import SATELLITE_FUNCTION_DISASTER_IMAGING, BASESTATION
@@ -14,7 +12,7 @@ from src.controllers.hello import hello
 from src.controllers.identify import return_identity
 from src.controllers.handshake import handshake
 from src.heartbeat.heartbeat import heartbeat
-from src.middleware.header_middleware import check_headers
+from src.middleware.header_middleware import check_headers, extract_bobb_headers
 from enum import Enum
 from typing import Dict, List, Optional, Tuple
 from src.routing.find_best_route import find_alternate_route, find_best_route, simulate_satellite_failure
@@ -290,6 +288,45 @@ def receive_heartbeat():
     # Call controller function if headers are valid
     return heartbeat()
 
+@router.route('/image', methods=['POST'])
+def receive_image():
+    middleware_response = check_headers()
+    if middleware_response is not True:
+        return middleware_response
+
+    if request.json is None:
+        return jsonify({
+            "status": "error",
+            "message": "No image data received",
+            "status_code": 400
+        }), 400
+
+    headers = extract_bobb_headers()
+    dest_ip = headers["dest_ipv4"]
+    dest_port = headers["dest_port"]
+
+    current_ip = os.getenv("IP")
+    current_port = os.getenv("PORT")
+
+    if str(dest_ip) == str(current_ip) and str(dest_port) == str(current_port):
+        print("Found the destination base station")
+        return jsonify({
+            "status": "success",
+            "message": f"Image received at {dest_ip}:{dest_port}",
+            "status_code": 200
+        }), 200
+
+    route_info = find_best_route(f"{current_ip}:{current_port}", f"{dest_ip}:{dest_port}", "high")
+    if not route_info:
+        return jsonify({
+            "status": "error",
+            "message": f"No route found between {current_ip}:{current_port} and {dest_ip}:{dest_port}",
+            "status_code": 404
+        }), 404
+
+    print("Sending image to: ", route_info["path"][0])
+    response = requests.post(f"https://{route_info['path'][0]}/image", headers=request.headers, verify=False, json=request.json)
+    return response.json()
 
 
 # Base station routes

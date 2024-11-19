@@ -69,12 +69,12 @@ def find_x_satellites(ips_to_check=None, min_port=33001, max_port=33100, endpoin
 
     ip = os.getenv("IP")
     # If on a private IP address, assume raspberry pis
-    # if ip.split('.')[0] == "10":
-    #     # Default list of ips to check - raspberry pi IPs
-    #     if ips_to_check is None:
-    #         ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
-    # else:
-    ips_to_check = ["localhost"]  # <- for local testing
+    if ip.split('.')[0] == "10":
+        # Default list of ips to check - raspberry pi IPs
+        if ips_to_check is None:
+            ips_to_check = ["10.35.70."+str(extension) for extension in range(1, 50)]
+    else:
+        ips_to_check = ["localhost"]  # <- for local testing
 
     for ip in ips_to_check:
         contact_time = ping_with_contact_time(ip)
@@ -139,6 +139,7 @@ def get_neighbouring_satellites():
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(remaining_satellites)  # Write the remaining satellites to the file
+            csvfile.close()
     except Exception as e:
         print(f"[ERROR] Failed to write full satellite listing: {e}")
     # Write the to-be-discovered satellites to the discovery file
@@ -152,13 +153,5 @@ def get_neighbouring_satellites():
     except Exception as e:
         print(f"[ERROR] Failed to write to_be_discovered list: {e}")
 
-
-
-    # with open(file_name, "w", newline="") as csvfile:
-    #     # print(f"Writing to {file_name}")
-    #     fieldnames = ["IPv4", "Port", "Contact Time", "Device Function"]
-    #     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    #     writer.writeheader()
-    #     writer.writerows(starter_satellite_list)
 
     send_handshakes()
