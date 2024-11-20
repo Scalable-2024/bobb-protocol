@@ -34,8 +34,8 @@ class RouteType(Enum):
     RANDOM = 1
 
 
-@router.route("/call_satellite_from_whale", methods=["POST"])
-def call_satellite_from_whale():
+@router.route("/call_satellite_from_drone", methods=["POST"])
+def call_satellite_from_drone():
     """
     Route a message between satellites.
     Expected POST body: {
@@ -116,7 +116,7 @@ def call_satellite_from_whale():
         try:
             # Forward the request to random satellite with timeout
             forward_response = requests.post(
-                f"https://{random_satellite}/call_satellite_from_whale",
+                f"https://{random_satellite}/call_satellite_from_drone",
                 json={
                     "source": source,
                     "destination": destination,
