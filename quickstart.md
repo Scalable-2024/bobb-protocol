@@ -25,7 +25,7 @@ If testing locally and your IP address does not start with 10, run the code as n
 ## Guideline for running Group 9 files
 Simulate the satellites by running the following command. Below is the example of simulating 10 satellites with device function for flood post drone in port 33001 - 33010
 ```sh
-sh multi-device.sh 10 drone-aerial true 33001
+sh multi-device.sh 10 aerial-drones true 33001
 ```
 Simulate base station by runing the following command. Below is the example of simulating 1 base station in port 33011
 ```sh
