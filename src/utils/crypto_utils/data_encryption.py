@@ -1,4 +1,4 @@
-
+# Written by Hariharan
 # utils/crypto_utils/data_encryption.py
 import os
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
