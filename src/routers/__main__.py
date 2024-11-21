@@ -63,11 +63,15 @@ def call_satellite_from_whale():
         current_satellite = f"{current_ip}:{current_port}"
 
         if destination == current_satellite:
-            device_type = os.getenv("DEVICE_TYPE")
+            device_type = os.getenv("DEVICE_FUNCTION")
             if device_type != BASESTATION:
                 device_type = f"Satellite with function {device_type}"
-            print(f"Message {message} arrived at {device_type} from source {source}")
-            return
+            print(f"Message {data} arrived at {device_type} from source {source}")
+            return jsonify({
+                "status": "success",
+                "message": "Message arrived at destination",
+                "status_code": 200
+            }), 200
 
         # If we've already been here, stop
         if current_satellite in hops:
@@ -112,7 +116,7 @@ def call_satellite_from_whale():
         try:
             # Forward the request to random satellite with timeout
             forward_response = requests.post(
-                f"https://{random_satellite}/route",
+                f"https://{random_satellite}/call_satellite_from_whale",
                 json={
                     "source": source,
                     "destination": destination,
