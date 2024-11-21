@@ -1,3 +1,4 @@
+# Written by Claire
 #!/bin/sh
 
 # Define the target directory for resource cleanup
