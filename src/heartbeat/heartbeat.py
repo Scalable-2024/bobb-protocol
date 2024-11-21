@@ -1,3 +1,4 @@
+# Initial skeleton written by Lakshman, rewritten by Patrick, blocklist added by Eoghan, other modifications by Niels, Hariharan, Aryan, Claire
 import json
 import os
 import sys
