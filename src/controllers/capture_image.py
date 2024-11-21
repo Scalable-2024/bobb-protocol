@@ -1,3 +1,4 @@
+# Written by Niels
 from flask import request
 
 def capture_image():
