@@ -1,3 +1,4 @@
+# Written by Claire, modified by Patrick
 import time
 from src.utils.handshake_body import SatelliteHandshake
 from src.utils.headers.necessary_headers import BobbHeaders
