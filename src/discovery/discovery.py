@@ -1,4 +1,4 @@
-# Written by Claire, modified by Niels and Patrick
+# Written by Claire, modified by Niels, Patrick and Eoghan
 import subprocess
 import re
 import csv
