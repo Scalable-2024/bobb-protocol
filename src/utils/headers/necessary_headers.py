@@ -1,3 +1,4 @@
+# Written by Aryan, modified by Patrick
 # headers/bob2_headers.py
 
 import struct
