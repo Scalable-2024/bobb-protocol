@@ -1,4 +1,4 @@
-import time
+# Written by Claire, modified by Patrick
 from src.utils.handshake_body import SatelliteHandshake
 from src.utils.headers.necessary_headers import BobbHeaders
 from src.config.constants import X_BOBB_HEADER

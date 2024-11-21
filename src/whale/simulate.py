@@ -1,3 +1,4 @@
+# Written by Claire, whale data generation written by Patrick
 import threading
 import random
 import time

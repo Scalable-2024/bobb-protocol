@@ -1,5 +1,4 @@
-import argparse
-import logging
+# Written by Claire, modified by Niels and Patrick
 import subprocess
 import re
 import csv

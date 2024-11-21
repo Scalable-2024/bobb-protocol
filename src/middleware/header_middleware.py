@@ -1,3 +1,4 @@
+# Written by Aryan, modified by Claire and Niels
 from flask import request, g
 from src.utils.headers.necessary_headers import BobbHeaders
 from src.utils.headers.optional_header import BobbOptionalHeaders

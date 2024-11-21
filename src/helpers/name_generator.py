@@ -1,3 +1,4 @@
+# Written by Niels
 import socket
 from random import random
 from typing import Optional, Tuple

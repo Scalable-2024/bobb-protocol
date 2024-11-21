@@ -1,3 +1,4 @@
+# Written by Aryan, modified by Niels and Eoghan
 # Header Names
 X_BOBB_HEADER = "X-Bobb-Header"
 X_BOBB_OPTIONAL_HEADER = "X-Bobb-Optional-Header"

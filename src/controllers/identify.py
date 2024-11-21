@@ -1,3 +1,4 @@
+# Written by Claire
 from src.helpers.response_helper import create_response
 from src.config.config import CONFIG_FILE_PATH
 import os

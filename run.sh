@@ -1,3 +1,4 @@
+# Written by Aryan, modified by Claire and Patrick
 #!/bin/bash
 
 # Create and activate a Python virtual environment
