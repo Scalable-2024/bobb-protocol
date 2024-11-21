@@ -1,4 +1,4 @@
-# Written by Claire, modified by Niels, Patrick and Eoghan
+# Written by Claire, modified by Niels, Patrick. Discovery lists added by Eoghan
 import subprocess
 import re
 import csv
