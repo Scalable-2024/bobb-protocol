@@ -34,5 +34,5 @@ sh multi-device.sh 1 basestation true 33011
 **Use case simulation Group 9 specific**
 Simulate 5 drones sending data to satellites and then forwarding to base station, running following command:
 ```sh
-python3 -m src.drone.simulate --destination_ip=10.6.47.63 --destination_port=33011 --num_drones=5
+python3 -m src.drone.simulate --destination_ip=10.6.47.63 --destination_port=33011 --num_drones=10
 ```
