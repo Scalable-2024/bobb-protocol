@@ -41,7 +41,7 @@ Note: you can change any number of satellites by changing the `--max_satellites`
 ## Output
 ### 1. topology visualization
 This process will dynamically update visualization of the topology update every 10 seconds. Below is a possible example:
-![Figure_1.png](../Figure_1.png)
+![Figure_1.png](Figure_1.png)
 ### 2. satellites_config.json
 Dynamically update the satellites information including ip, port and neighbors, below is a possible example:
 ```json
