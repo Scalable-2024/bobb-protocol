@@ -1,4 +1,4 @@
-# bobb_protocol/src/discovery/discovery.py Written by Clare, modified by Yuchen
+# bobb_protocol/src/discovery/discovery.py Written by Claire, modified by Yuchen
 import argparse
 import json
 import random
