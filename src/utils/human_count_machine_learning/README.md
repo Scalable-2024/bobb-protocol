@@ -1,4 +1,6 @@
-# Human count using YOLO object detection model
+# Human count using YOLO object detection model 
+
+Note: This ML function failed to integrate to the final version of bobb protocol but successfully run individually.
 
 ## Following are the steps to run the code for getting human count from image:
 1. create and activate virtual env in python
