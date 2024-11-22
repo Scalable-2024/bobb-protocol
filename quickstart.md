@@ -12,7 +12,7 @@ When running on the standard Raspberry Pi in the provided SCSS network, just run
 sh multi-device.sh <COUNT> <DEVICE_FUNCTION> <RESET_RESOURCES> [START_PORT]
 ```
 1. **COUNT:** Number of simulated devices to start up.
-2. **DEVICE_FUNCTION:** The function of this device - eg basestation or any of the valid satellite functions (disaster-imaging, whale-tracking, windfarm-monitoring, post-flood-survivor-detection-aerialdrones)
+2. **DEVICE_FUNCTION:** The function of this device - eg basestation or any of the valid satellite functions (disaster-imaging, whale-tracking, aerial-drones)
 3. **RESET_RESOURCES:** If running the code for the first time this iteration, set to true. Otherwise (generally), set to false.
 4. **START_PORT:** Port to start running simulated devices on - when running on raspberry pis, must be in range 33000 to 34000.
 
