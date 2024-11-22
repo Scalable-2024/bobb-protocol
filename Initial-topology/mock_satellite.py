@@ -1,4 +1,4 @@
-# Writen by Yuchen
+# Written by Yuchen
 """
     This script simulates a satellite server that provides information about its state and neighbors.
 """
