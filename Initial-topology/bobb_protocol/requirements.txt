@@ -1,0 +1,10 @@
+flask
+werkzeug
+hypercorn
+aiohttp
+flask-JWT-Extended
+flask-Cors
+httpx
+setuptools
+rsa
+networkx
