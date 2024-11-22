@@ -4,7 +4,7 @@ import subprocess
 import re
 import platform
 
-# Writen by Yuchen
+# Written by Yuchen
 """
     This script provides utility functions for interacting with satellites in the network.
 """
