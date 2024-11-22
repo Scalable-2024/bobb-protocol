@@ -1,5 +1,7 @@
 # Bobb Protocol
 
+# Important Note: The folders "Allow self signed certificate" and "Initial-Topology" were approaches explored and tested but are not implemented in the final Bobb so can be ignored when testing Bobb protocol and use-case  
+
 ## Introduction
 For the Bobb protocol we have made the choice to use HTTP protocol as the underlying transport protocol. This choice was made because of the simplicity of the protocol and the fact that it is widely used.
 
