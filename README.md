@@ -1,6 +1,8 @@
 # Bobb Protocol
 
-# Important Note: The folders "Allow self signed certificate" and "Initial-Topology" were approaches explored and tested but are not implemented in the final Bobb so can be ignored when testing Bobb protocol and use-case  
+#Important Note: 
+The folders "Allow self signed certificate" and "Initial-Topology" were approaches explored and tested but are not implemented in the final Bobb so can be ignored when testing Bobb protocol and use-case
+Also when running erros surrounding json appear, these happen for the first minute or so while running but eventually resolve themselves furthermore the error "Error creating routing table" can also be ignored. They are being created correctly but we did not want to make changes to the code this close to the deadline incase of causing further issues.
 
 ## Introduction
 For the Bobb protocol we have made the choice to use HTTP protocol as the underlying transport protocol. This choice was made because of the simplicity of the protocol and the fact that it is widely used.
