@@ -22,9 +22,22 @@ proxies = {
   'https': '',
 }
 
+def get_random_city():
+    """Select a random city from a predefined list of city names."""
+    cities = [
+        "Valencia", "Madrid", "Barcelona", "Sevilla", "Zaragoza", 
+        "Málaga", "Murcia", "Palma de Mallorca", 
+        "Las Palmas de Gran Canaria", "Bilbao", "Granada", 
+        "Santander", "Alicante", "Valladolid", "Oviedo"
+    ]
+    return random.choice(cities)
+  
+def ping_with_response_time(ipv4, timeout=1):
+    """Ping an IPv4 address and return the response time in ms."""
 
 def ping_with_contact_time(ipv4, timeout=1):
     """Ping an IPv4 address and return the last contact time as a UNIX timestamp"""
+
     try:
         output = subprocess.check_output(
             "ping -c 1 -W {} {}".format(timeout, ipv4),
