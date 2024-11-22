@@ -8,7 +8,7 @@ from datetime import datetime
 from discovery import discover_satellites, build_topology, update_topology, visualize_topology
 from satellite_utils import remove_offline_satellites, update_satellite_status
 
-# Writen by Yuchen
+# Written by Yuchen
 """
     This script simulates dynamic updates to the network topology based on satellite status and configuration changes.
 """
