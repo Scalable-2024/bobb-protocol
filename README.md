@@ -87,7 +87,6 @@ The Bobb protocol uses Public Key Infrastructure (PKI) to encrypt messages betwe
 The Bobb protocol is currently used for the following use cases:
 - Disaster imaging (Group 13)
 - Whale tracking (Group 1)
-- Offshore wind farm monitoring (Group 8)
 - Post flood survivor detection (Group 9)
 
 ## Device Types
